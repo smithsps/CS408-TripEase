@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     compile 'io.vertx:vertx-core:3.0.0'
+    compile 'io.vertx:vertx-web:3.0.0'
 }
 
 shadowJar {
@@ -35,6 +36,9 @@ shadowJar {
     }
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+    into 'webroot', {
+        from 'src/site'
     }
 }
 

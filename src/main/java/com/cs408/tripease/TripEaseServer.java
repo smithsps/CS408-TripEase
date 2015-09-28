@@ -1,18 +1,42 @@
 package com.cs408.tripease;
 
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.Route;
+import io.vertx.ext.web.handler.StaticHandler;
 
-public class TripEaseServer {
+
+public class TripEaseServer extends AbstractVerticle {
 
     private static final Logger log = LoggerFactory.getLogger(TripEaseServer.class);
 
-    public static void main(String[] args) {
-        int port;
-        String hostname;
+    private static int port;
+    private static String hostname;
 
+    @Override
+    public void start() {
+        Vertx vertx = Vertx.vertx();
+
+        HttpServer server = Vertx.vertx().createHttpServer();
+        Router router = Router.router(vertx);
+        Route route = router.route("/*");
+
+        StaticHandler staticHandler = StaticHandler.create();
+        //As we are still developing we don't want to cache files.
+        staticHandler.setCachingEnabled(false);
+
+        route.handler(staticHandler);
+
+
+        System.out.println("TripEase server started at port:" + port + " on " + hostname);
+        server.requestHandler(router::accept).listen(port, hostname);
+    }
+
+    public static void main(String[] args) {
         try {
             port = Integer.parseInt(System.getenv("OPENSHIFT_VERTX_PORT"));
         } catch (NullPointerException | NumberFormatException ex) {
@@ -30,9 +54,8 @@ public class TripEaseServer {
             hostname = "localhost";
         }
 
-        System.out.println("TripEase server started at port:" + port + " on " + hostname);
-        // Create an HTTP server which simply returns "Hello World!" to each request.
-        Vertx.vertx().createHttpServer()
-                .requestHandler(req -> req.response().end("CS408 : TripEase")).listen(port, hostname);
+        //Not sure if more preferred way to start.
+        TripEaseServer server = new TripEaseServer();
+        server.start();
     }
 }
