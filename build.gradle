@@ -31,7 +31,7 @@ dependencies {
 shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'io.vertx.example.HelloWorldEmbedded'
+        attributes 'Main-Class': 'com.cs408.tripease.TripEaseServer'
     }
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
