@@ -37,29 +37,48 @@ public class TripEaseServer extends AbstractVerticle {
         HttpServer server = Vertx.vertx().createHttpServer();
         Router router = Router.router(vertx);
 
-        //Assets routing (Redundant atm with the above route)
-        router.routeWithRegex(".+(fonts|css|images|js).*")
-              .handler(StaticHandler.create());
-
-       //User Authorizations
+        //JDBC Client
         JDBCClient jdbcClient = JDBCClient.createShared(vertx, jdbcConfig);
         JDBCAuth authProvider = JDBCAuth.create(jdbcClient);
 
-
+        //Various handlers doing a variety of things.
         router.route().handler(CookieHandler.create());
         router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
         router.route().handler(UserSessionHandler.create(authProvider));
+        router.route().handler(BodyHandler.create());
 
+
+        //Planner is our application area, so we need them to login before that.
         router.route("/planner/*").handler(RedirectAuthHandler.create(authProvider, "/login"));
-        router.post("/login").handler(FormLoginHandler.create(authProvider));
+
+        //Our login form sends the login information via HTTP Post we handle that here
+        //Goes to /planner if successful login, 403 if failure.
+        router.post("/login").handler(
+            FormLoginHandler.create(authProvider).setDirectLoggedInOKURL("/planner")
+        );
+
+        //The actual login page, from this page the use submits the login information
         router.route("/login").handler(routingContext -> {
             routingContext.response().sendFile("webroot/login.html");
         });
 
-        //Main Page
-        router.route().handler(StaticHandler.create().setIncludeHidden(false).setCachingEnabled(false));
+        //Assets routing
+        router.routeWithRegex(".+(fonts|css|images|js).*").handler(
+            StaticHandler.create()
+        );
 
-        System.out.println("TripEase server started at port:" + port + " on " + hostname);
+        //Simple Pages
+        router.route("/").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/index.html");
+        });
+        router.route("/about").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/about.html");
+        });
+        router.route("/planner").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/planner.html");
+        });
+
+        TripEaseServer.log.info("TripEase server started at port:" + port + " on " + hostname);
         server.requestHandler(router::accept).listen(port, hostname);
     }
 

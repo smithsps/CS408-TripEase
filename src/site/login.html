@@ -41,17 +41,17 @@
 
         <div class="inner cover" style="margin:-5% -10%;">
           <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Please Login</h1>
-          <form class="form-horizontal" action="/login">
+          <form class="form-horizontal" action="/login" method="post">
             <div class="form-group">
-              <label for="inputEmail" class="control-label col-xs-2">Email</label>
+              <label for="inputUserName" class="control-label col-xs-2">Username</label>
               <div class="col-xs-10">
-                <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                <input type="text" name="username" class="form-control" id="inputUserName" placeholder="Username">
               </div>
             </div>
             <div class="form-group">
               <label for="inputPassword" class="control-label col-xs-2">Password</label>
               <div class="col-xs-10">
-                <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
               </div>
             </div>
             <div class="form-group">
