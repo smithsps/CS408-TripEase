@@ -17,6 +17,7 @@ import io.vertx.ext.auth.User;
 
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.*;
 
 
 
@@ -40,6 +41,26 @@ public class TripEaseServer extends AbstractVerticle {
         //JDBC Client
         JDBCClient jdbcClient = JDBCClient.createShared(vertx, jdbcConfig);
         JDBCAuth authProvider = JDBCAuth.create(jdbcClient);
+
+		System.out.println("Starting Connection");
+		jdbcClient.getConnection(res -> {
+		  if (res.succeeded()) {
+
+			SQLConnection connection = res.result();
+
+			connection.query("SELECT * FROM user", res2 -> {
+			  if (res2.succeeded()) {
+				System.out.println("Connection Successes");
+				ResultSet rs = res2.result();
+				// Do something with results
+			  }
+			});
+		  } else {
+		  	System.out.println("Connection Failed");
+			// Failed to get connection - deal with it
+		  }
+		});
+
 
         //Various handlers doing a variety of things.
         router.route().handler(CookieHandler.create());
@@ -112,13 +133,13 @@ public class TripEaseServer extends AbstractVerticle {
 
             dbPort = 3306;
             dbHostname = "localhost";
-            dbUsername = "u";
-            dbPassword = "p";
+            dbUsername = "bshrawder";
+            dbPassword = "X2TeN7NNX7XJdJsJ";
         }
-        jdbcConfig.put("url", dbHostname);
-        jdbcConfig.put("port", dbPort);
-        jdbcConfig.put("username", dbUsername);
+        jdbcConfig.put("url", "jdbc:mysql://" + dbHostname + ":" + dbPort + "/tripease");
+        jdbcConfig.put("user", dbUsername);
         jdbcConfig.put("password", dbPassword);
+        jdbcConfig.put("driver_class", "com.mysql.jdbc.Driver");
 
 
         //Not sure if more preferred way to start.
