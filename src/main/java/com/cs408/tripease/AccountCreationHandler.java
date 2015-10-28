@@ -19,6 +19,8 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import java.lang.String;
 import java.util.Random;
@@ -68,6 +70,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                 log.warn("Improper parameters inputted.");
                 context.fail(400);
             } else {
+
                 //Add error checking for params here
                 
                 String saltStr = getSalt();
@@ -75,6 +78,25 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                 
                 log.warn(hexPassword + "  ::   " + getSalt());
                 
+
+                if(!password.equals(passwordConfirm)){
+					//passwords do not match print errror
+					log.warn("Password does not match\n\n\n");
+					context.fail(400);
+				}
+				if(!email.equals(emailConfirm)){
+					//emails do not match print error
+					log.warn("Emails do not match\n\n\n");
+					context.fail(400);
+				}
+				Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
+				Matcher m = P.matcher(email);
+				boolean matchFound  = m.matches();
+
+				if(!matchFound){
+					log.warn("not a vaild email\n\n\n");
+					context.fail(400);
+				}
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();

@@ -75,6 +75,11 @@ public class TripEaseServer extends AbstractVerticle {
         router.route("/create").handler(routingContext -> {
             routingContext.response().sendFile("webroot/create.html");
         });
+	//The user details page
+	router.post("/userdetails").handler(AccountCreationHandler.create(jdbcClient));
+        router.route("/userdetails").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/userdetails.html");
+        });
 
         //Assets routing
         router.routeWithRegex(".+(fonts|css|images|js).*").handler(
