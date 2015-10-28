@@ -2,10 +2,12 @@ package com.cs408.tripease;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.net.JksOptions;
 
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.Route;
@@ -18,8 +20,6 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.*;
-
-
 
 
 public class TripEaseServer extends AbstractVerticle {
@@ -35,31 +35,19 @@ public class TripEaseServer extends AbstractVerticle {
     public void start() {
         Vertx vertx = Vertx.vertx();
 
-        HttpServer server = Vertx.vertx().createHttpServer();
+        HttpServerOptions options = new HttpServerOptions().setSsl(true).setKeyStoreOptions(
+            new JksOptions().
+                setPath("keystore.jks").
+                setPassword("cs40800")
+        );
+
+
+        HttpServer server = Vertx.vertx().createHttpServer(options);
         Router router = Router.router(vertx);
 
         //JDBC Client
         JDBCClient jdbcClient = JDBCClient.createShared(vertx, jdbcConfig);
         JDBCAuth authProvider = JDBCAuth.create(jdbcClient);
-
-		System.out.println("Starting Connection");
-		jdbcClient.getConnection(res -> {
-		  if (res.succeeded()) {
-
-			SQLConnection connection = res.result();
-
-			connection.query("SELECT * FROM user", res2 -> {
-			  if (res2.succeeded()) {
-				System.out.println("Connection Successes");
-				ResultSet rs = res2.result();
-				// Do something with results
-			  }
-			});
-		  } else {
-		  	System.out.println("Connection Failed");
-			// Failed to get connection - deal with it
-		  }
-		});
 
 
         //Various handlers doing a variety of things.
@@ -81,6 +69,11 @@ public class TripEaseServer extends AbstractVerticle {
         //The actual login page, from this page the use submits the login information
         router.route("/login").handler(routingContext -> {
             routingContext.response().sendFile("webroot/login.html");
+        });
+
+        router.post("/create").handler(AccountCreationHandler.create(jdbcClient));
+        router.route("/create").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/create.html");
         });
 
         //Assets routing
