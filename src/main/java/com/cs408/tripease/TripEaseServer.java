@@ -124,7 +124,7 @@ public class TripEaseServer extends AbstractVerticle {
             port = Integer.parseInt(System.getenv("OPENSHIFT_VERTX_PORT"));
         } catch (NullPointerException | NumberFormatException ex) {
             TripEaseServer.log.info("Could not find Openshift port, using port 8080.");
-            port = 8080;
+            port = 8090;
         }
 
         try {
