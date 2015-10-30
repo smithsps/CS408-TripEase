@@ -67,7 +67,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
             String emailConfirm = params.get(emailConfirmParam);
             if (username == null || password == null || passwordConfirm == null ||
                     email == null || emailConfirm == null) {
-                log.warn("Improper parameters inputted.");
+                log.warn("Improper parameters inputted in creation handler.");
                 context.fail(400);
             } else {
 
