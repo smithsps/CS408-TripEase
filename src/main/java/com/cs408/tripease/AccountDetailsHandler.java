@@ -81,6 +81,7 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                             } else {
+				   context.fail(400);
                                 log.error("Could not edit account details in the database.");
                             }
 
