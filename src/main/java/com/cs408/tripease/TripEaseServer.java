@@ -20,6 +20,7 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.*;
+import io.vertx.ext.auth.jdbc.impl.JDBCAuthImpl;
 
 
 public class TripEaseServer extends AbstractVerticle {
@@ -48,7 +49,7 @@ public class TripEaseServer extends AbstractVerticle {
         //JDBC Client
         JDBCClient jdbcClient = JDBCClient.createShared(vertx, jdbcConfig);
         JDBCAuth authProvider = JDBCAuth.create(jdbcClient);
-
+		authProvider.setAuthenticationQuery("SELECT PASSWORD, PASSWORD_SALT FROM user WHERE USERNAME = ?");
 
         //Various handlers doing a variety of things.
         router.route().handler(CookieHandler.create());
@@ -117,6 +118,7 @@ public class TripEaseServer extends AbstractVerticle {
 
         TripEaseServer.log.info("TripEase server started at port:" + port + " on " + hostname);
         server.requestHandler(router::accept).listen(port, hostname);
+        
     }
 
     public static void main(String[] args) {
