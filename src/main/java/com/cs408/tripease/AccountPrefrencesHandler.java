@@ -30,20 +30,21 @@ import java.security.NoSuchAlgorithmException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-public class AccountDetailsHandler implements Handler<RoutingContext> {
+public class AccountPrefrencesHandler implements Handler<RoutingContext> {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountDetailsHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(AccountPrefrencesHandler.class);
 
 
-    private String NameParam = "FullName";
-    private String AgeParam = "Age";
-    private String Genderparam = "Gender";
+    private String LocationParam = "Location";
+    private String FoodTypeParam = "FoodType";
+    private String BudgetParam = "Budget";
+    private String LengthParam = "LengthofStay";
     private String redirectURL = "/login";
 
     private JDBCClient jdbcClient;
 
-    public static AccountDetailsHandler create(JDBCClient jc) {
-        AccountDetailsHandler ach = new AccountDetailsHandler();
+    public static AccountPrefrencesHandler create(JDBCClient jc) {
+        AccountPrefrencesHandler ach = new AccountPrefrencesHandler();
         ach.jdbcClient = jc;
         return ach;
     }
@@ -59,29 +60,30 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
             }
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
-	    //String email = "Email@email.com";
-            //String password = params.get(passwordParam);
-	    String FullName = params.get(NameParam);
-	    String Age = params.get(AgeParam);
-	    //int Age1 = Integer.parseInt(Age);
-	    String Gender = params.get(Genderparam);
-            if (FullName == null|| Age == null || Gender == null) {
-                log.warn("Improper parameters inputted here.");
+	  
+	  
+	    String Location = "London1";//params.get(LocationParam);
+	    String FoodType = "Mexican,American1";//params.get(FoodTypeParam);
+	    String Budget = "4001";//params.get(BudgetParam);
+	    String Length = "61";//params.get(LengthParam);
+
+
+
+            if (Location == null|| FoodType == null || Budget == null || Length == null) {
+                log.warn("Improper parameters inputted in prefrences.");
                 context.fail(404);
             } else {
-
-                //Add error checking for params here
-                
+   
                   
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
                         
-                        connection.execute("INSERT INTO userDetails VALUES ('" + username + "', '" + FullName + "', '" + Age + "' , '" + Gender + "')", res2 -> {
+                        connection.execute("INSERT INTO preferences VALUES ('" + username + "', '" + FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                             } else {
-                                log.error("Could not edit account details in the database.");
+                                log.error("Could not edit account prefrencres in the database.");
                             }
 
                         });
