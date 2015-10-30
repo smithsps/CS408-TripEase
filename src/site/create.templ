@@ -21,23 +21,7 @@
     <![endif]-->
 </head>
 <script>
-function showAlert(){
-	var pass = document.getElementById("inputPassword").value;
-	var passconf = document.getElementById("inputPasswordConfirm").value;
-	var Error = "passwords do not match try again";
-	var Error1 = "passed";
-	if(pass != passconf){
 
-		alert(Error);
-		
-
-	}else{
-		alert(Error1);
-	}
-	//var  myText = "why not";
-	//alert(myText);
-
-}
 </script>
 
 
@@ -103,6 +87,7 @@ function showAlert(){
                 <button onclick="type=showAlert()" submit" class="btn btn-primary">Create Account</button>
             </div>
         </div>
+        @{ context.session().get("errorCreateAccount")}
     </form>
 </div>
 

@@ -81,20 +81,26 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
 					log.warn("Password does not match\n\n\n");
-					context.fail(400);
+                    context.session().put("errorCreateAccount", "Passwords does not match.");
+                    doRedirect(req.response(), "create");
+                    return;
 				}
 				if(!email.equals(emailConfirm)){
 					//emails do not match print error
 					log.warn("Emails do not match\n\n\n");
-					context.fail(400);
-				}
+                    context.session().put("errorCreateAccount", "Emails do not match.");
+                    doRedirect(req.response(), "create");
+                    return;
+                }
 				Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
 				Matcher m = P.matcher(email);
 				boolean matchFound  = m.matches();
 
 				if(!matchFound){
 					log.warn("not a vaild email\n\n\n");
-					context.fail(400);
+                    context.session().put("errorCreateAccount", "Email is not a valid email.");
+                    doRedirect(req.response(), "create");
+                    return;
 				}
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
@@ -103,14 +109,19 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                         connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
+                                context.session().remove("errorCreateAccount");
                             } else {
                                 log.error("Could not create the user account in the database.");
+                                context.session().put("errorCreateAccount", "Unknown error. Could not create account.");
+                                doRedirect(req.response(), "create");
                             }
 
                         });
                     } else {
                         log.error("Could not connect to database.");
-                        context.fail(402);
+                        context.session().put("errorCreateAccount", "Could not connect to the database.");
+                        doRedirect(req.response(), "create");
+                        return;
                     }
                 });
             }
