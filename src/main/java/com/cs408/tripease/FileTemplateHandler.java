@@ -1,11 +1,13 @@
 package com.cs408.tripease;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.handler.TemplateHandler;
 import io.vertx.ext.web.impl.Utils;
 import io.vertx.ext.web.templ.TemplateEngine;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.Handler;
+import io.vertx.ext.web.impl.Utils;
 
 public class FileTemplateHandler implements Handler<RoutingContext>{
 
@@ -23,7 +25,7 @@ public class FileTemplateHandler implements Handler<RoutingContext>{
 
     @Override
     public void handle(RoutingContext context) {
-        String file = "/" + filename;
+        String file = Utils.pathOffset(filename, context);
         engine.render(context, file, res -> {
             if (res.succeeded()) {
                 context.response().putHeader(HttpHeaders.CONTENT_TYPE, contentType).end(res.result());

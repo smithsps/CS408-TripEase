@@ -127,7 +127,8 @@ public class AccountPrefrencesHandler implements Handler<RoutingContext> {
             }
         }
     }
-        private void doRedirect(HttpServerResponse response, String url) {
+
+    private void doRedirect(HttpServerResponse response, String url) {
         response.putHeader("location", url).setStatusCode(302).end();
     }
 }
