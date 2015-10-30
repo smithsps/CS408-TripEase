@@ -20,6 +20,26 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
+<script>
+function showAlert(){
+	var pass = document.getElementById("inputPassword").value;
+	var passconf = document.getElementById("inputPasswordConfirm").value;
+	var Error = "passwords do not match try again";
+	var Error1 = "passed";
+	if(pass != passconf){
+
+		alert(Error);
+		
+
+	}else{
+		alert(Error1);
+	}
+	//var  myText = "why not";
+	//alert(myText);
+
+}
+</script>
+
 
 <body>
 
@@ -47,7 +67,7 @@
 
 <div class="inner cover" style="margin:-5% -10%;">
     <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Create Your Account!</h1>
-    <form class="form-horizontal" action="/create" method="post">
+    <form class="form-horizontal" action="/create" method="post"> <!--add /create back in -->
         <div class="form-group">
             <label for="inputUserName" class="control-label col-xs-2">Username</label>
             <div class="col-xs-10">
@@ -80,7 +100,7 @@
         </div>
         <div class="form-group">
             <div class="col-xs-offset-2 col-xs-10">
-                <button type="submit" class="btn btn-primary">Create Account</button>
+                <button onclick="type=showAlert()" submit" class="btn btn-primary">Create Account</button>
             </div>
         </div>
     </form>
