@@ -29,6 +29,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import io.vertx.ext.auth.jdbc.impl.JDBCAuthImpl;
 
 public class AccountCreationHandler implements Handler<RoutingContext> {
 
@@ -73,11 +74,9 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
 
                 //Add error checking for params here
                 
-                String saltStr = getSalt();
-                String hexPassword = computeHash(password + saltStr);
-                
-                log.warn(hexPassword + "  ::   " + getSalt());
-                
+                String salt = getSalt();
+                String hexPassword = JDBCAuthImpl.computeHash(password, salt, "SHA-512");
+    
 
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
@@ -101,7 +100,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
                         
-                        connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + saltStr + "', '" + email + "')", res2 -> {
+                        connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                             } else {
@@ -122,32 +121,21 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
         final Random r = new SecureRandom();
 		byte[] salt = new byte[32];
 		r.nextBytes(salt);
-        return new String(salt, StandardCharsets.UTF_8);
+        return toHex(salt);
     }
     
-    private String computeHash(String hashandsalt) {
-    	try {
-    		MessageDigest md = MessageDigest.getInstance("SHA-512");
-			md.update(hashandsalt.getBytes("UTF-8"));
-
-			byte[] digest = md.digest();
-		
-			//Convert hash to hex string.
-			char[] hexArray = "0123456789ABCDEF".toCharArray();
-			char[] hexChars = new char[digest.length * 2];
-			for ( int j = 0; j < digest.length; j++ ) {
-				int v = digest[j] & 0xFF;
-				hexChars[j * 2] = hexArray[v >>> 4];
-				hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-			}
-			return new String(hexChars);
-		
-		} catch (NoSuchAlgorithmException ex) {
-			throw new VertxException(ex);
-		} catch (UnsupportedEncodingException ex) {
-			throw new VertxException(ex);
+    
+    private String toHex(byte[] b) {
+		//Convert hash to hex string.
+		char[] hexArray = "0123456789ABCDEF".toCharArray();
+		char[] hexChars = new char[b.length * 2];
+		for ( int j = 0; j < b.length; j++ ) {
+			int v = b[j] & 0xFF;
+			hexChars[j * 2] = hexArray[v >>> 4];
+			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
-    }
+		return new String(hexChars);
+	}
     
 
     private void doRedirect(HttpServerResponse response, String url) {
