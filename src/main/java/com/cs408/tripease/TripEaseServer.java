@@ -22,6 +22,8 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.*;
 import io.vertx.ext.auth.jdbc.impl.JDBCAuthImpl;
 
+import io.vertx.ext.web.templ.MVELTemplateEngine;
+
 
 public class TripEaseServer extends AbstractVerticle {
 
@@ -38,7 +40,7 @@ public class TripEaseServer extends AbstractVerticle {
 
         HttpServerOptions options = new HttpServerOptions().setSsl(true).setKeyStoreOptions(
             new JksOptions().
-                setPath("keystore.jks").
+                setPath("webroot/keystore.jks").
                 setPassword("cs40800")
         );
 
@@ -52,10 +54,13 @@ public class TripEaseServer extends AbstractVerticle {
 		authProvider.setAuthenticationQuery("SELECT PASSWORD, PASSWORD_SALT FROM user WHERE USERNAME = ?");
 
         //Various handlers doing a variety of things.
+        router.route().handler(BodyHandler.create());
         router.route().handler(CookieHandler.create());
         router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
         router.route().handler(UserSessionHandler.create(authProvider));
-        router.route().handler(BodyHandler.create());
+
+
+        MVELTemplateEngine tEngine = MVELTemplateEngine.create();
 
 
         //Planner is our application area, so we need them to login before that.
@@ -76,23 +81,23 @@ public class TripEaseServer extends AbstractVerticle {
         router.route("/create").handler(routingContext -> {
             routingContext.response().sendFile("webroot/create.html");
         });
-	//The user details page
-	router.post("/userdetails").handler(AccountDetailsHandler.create(jdbcClient));
+	    //The user details page
+	    router.post("/userdetails").handler(AccountDetailsHandler.create(jdbcClient));
         router.route("/userdetails").handler(routingContext -> {
             routingContext.response().sendFile("webroot/userdetails.html");
         });
-	//The usser prefrences page
-	router.post("/userprefrences").handler(AccountPrefrencesHandler.create(jdbcClient));
+	    //The usser prefrences page
+	    router.post("/userprefrences").handler(AccountPrefrencesHandler.create(jdbcClient));
         router.route("/userprefrences").handler(routingContext -> {
             routingContext.response().sendFile("webroot/prefrences.html");
         });
-	//The Trip posibilites page
-	router.post("/tripPosibilites").handler(AccountCreationHandler.create(jdbcClient));
+	    //The Trip posibilites page
+	    router.post("/tripPosibilites").handler(AccountCreationHandler.create(jdbcClient));
         router.route("/tripPosibilites").handler(routingContext -> {
             routingContext.response().sendFile("webroot/posibilites.html");
         });
-	// The ratings page
-	router.post("/userratings").handler(AccountCreationHandler.create(jdbcClient));
+	    // The ratings page
+	    router.post("/userratings").handler(AccountCreationHandler.create(jdbcClient));
         router.route("/userratings").handler(routingContext -> {
             routingContext.response().sendFile("webroot/ratings.html");
         });
@@ -106,15 +111,15 @@ public class TripEaseServer extends AbstractVerticle {
         );
 
         //Simple Pages
-        router.route("/").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/index.html");
-        });
+        router.route("/").handler(FileTemplateHandler.create(tEngine, "webroot/index.templ"));
         router.route("/about").handler(routingContext -> {
             routingContext.response().sendFile("webroot/about.html");
         });
         router.route("/planner").handler(routingContext -> {
             routingContext.response().sendFile("webroot/planner.html");
         });
+
+
 
         TripEaseServer.log.info("TripEase server started at port:" + port + " on " + hostname);
         server.requestHandler(router::accept).listen(port, hostname);
@@ -126,7 +131,7 @@ public class TripEaseServer extends AbstractVerticle {
             port = Integer.parseInt(System.getenv("OPENSHIFT_VERTX_PORT"));
         } catch (NullPointerException | NumberFormatException ex) {
             TripEaseServer.log.info("Could not find Openshift port, using port 8080.");
-            port = 8090;
+            port = 8080;
         }
 
         try {
