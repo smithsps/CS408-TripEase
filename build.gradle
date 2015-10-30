@@ -32,6 +32,7 @@ dependencies {
     compile 'io.vertx:vertx-auth-jdbc:3.0.0'
     compile 'io.vertx:vertx-sql-common:3.1.0'
     compile 'mysql:mysql-connector-java:5.1.6'
+    compile 'io.vertx:vertx-web-templ-mvel:3.1.0'
 }
 
 shadowJar {
