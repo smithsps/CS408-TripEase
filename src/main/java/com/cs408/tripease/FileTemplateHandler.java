@@ -25,7 +25,7 @@ public class FileTemplateHandler implements Handler<RoutingContext>{
 
     @Override
     public void handle(RoutingContext context) {
-        String file = Utils.pathOffset(filename, context);
+        String file = filename;
         engine.render(context, file, res -> {
             if (res.succeeded()) {
                 context.response().putHeader(HttpHeaders.CONTENT_TYPE, contentType).end(res.result());
