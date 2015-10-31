@@ -83,6 +83,60 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             String Length = params.get(LengthParam);
 			String People = params.get(PeopleParam);
 
+            if(Location.equals("") || FoodType.equals("") || Budget.equals("") || Length.equals("") || People.equals("")) {
+                log.warn("One or more preferences left blank.");
+                context.session().put("errorUserPrefs", "One or more preferences left blank.");
+                doRedirect(req.response(), "userpreferences");
+                return;
+            }
+
+            try {
+                Integer budget = Integer.parseInt(Budget);
+                if (budget < 1 || budget > 1000000) {
+                    log.warn("Budget invalid");
+                    context.session().put("errorUserPrefs", "Budget is invalid");
+                    doRedirect(req.response(), "userpreferences");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                log.warn("Budget is not valid number.");
+                context.session().put("errorUserPrefs", "Budget is not a valid number.");
+                doRedirect(req.response(), "userpreferences");
+                return;
+            }
+
+            try {
+                Integer length = Integer.parseInt(Length);
+                if (length < 1 || length > 360) {
+                    log.warn("Length invalid");
+                    context.session().put("errorUserPrefs", "You cannot stay a period of that time.");
+                    doRedirect(req.response(), "userpreferences");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                log.warn("Length is not valid number.");
+                context.session().put("errorUserPrefs", "Length is not a valid number.");
+                doRedirect(req.response(), "userpreferences");
+                return;
+            }
+
+            try {
+                Integer people = Integer.parseInt(People);
+                if (people < 1 || people > 100) {
+                    log.warn("People invalid");
+                    context.session().put("errorUserPrefs", "You cannot have that amount of people.");
+                    doRedirect(req.response(), "userpreferences");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                log.warn("People is not valid number.");
+                context.session().put("errorUserPrefs", "People is not a valid number.");
+                doRedirect(req.response(), "userpreferences");
+                return;
+            }
+
+
+
             if (Location == null|| FoodType == null || Budget == null || Length == null || People == null) {
                 log.warn("Improper parameters inputted in preferences.");
                 context.fail(404);
