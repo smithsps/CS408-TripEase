@@ -1,5 +1,4 @@
 package com.cs408.tripease;
-
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
@@ -19,7 +18,7 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.*;
-import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.ResultSet.*;
 import io.vertx.ext.sql.SQLConnection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +30,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+
 
 public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 
@@ -56,7 +56,63 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
 
-        }
+	    String Location ="";
+	    String FoodType ="";
+	    String Budget="";
+	    String Length="";
+	    
+	    ///////////////////////////////////////////////////////////
+	    //get user prefrences
+	    /////////////////////////////////////////////////////////
+		jdbcClient.getConnection(res -> {
+		if(res.succeeded()) {
+			SQLConnection connection = res.result();
+			connection.query("SELECT * FROM hotel", res2 -> {
+				if(res2.succeeded()) {
+					ResultSet resultSet = res2.result();
+					for(JsonArray line : res2.result().getResults()){
+						String temp  = line.encode();
+						System.out.println("temp: "+temp);
+					}
+
+				}else{
+					log.error("Could not select from the user table");
+				}
+			});
+			}else{
+				log.error("coould not connect to database below");
+				context.fail(402);
+			}
+		});
+
+		
+	///////////////////////////////////////////////////////////////
+	//get trip details
+	/////////////////////////////////////////////////////////////
+		jdbcClient.getConnection(res -> {
+		if(res.succeeded()) {
+			SQLConnection connection = res.result();
+			connection.query("SELECT username FROM user", res2 -> {
+				if(res2.succeeded()) {
+					for (JsonArray line : res2.result().getResults()) {
+              					System.out.println(line.encode());
+					}
+
+				}else{
+					log.error("Could not select from the user table");
+				}
+			});
+			}else{
+				log.error("coould not connect to database below");
+				context.fail(402);
+			}
+		});
+	}
+    }
+
+
+    private void doRedirect(HttpServerResponse response, String url) {
+        response.putHeader("location", url).setStatusCode(302).end();
     }
 
 }
