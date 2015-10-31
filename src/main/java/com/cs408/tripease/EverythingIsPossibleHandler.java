@@ -30,21 +30,31 @@ import java.security.NoSuchAlgorithmException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-public class EverythingIsPossible implements Handler<RoutingContext> {
+public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 
-    private static final Logger log = LoggerFactory.getLogger(EverythingIsPossible.class);
+    private static final Logger log = LoggerFactory.getLogger(EverythingIsPossibleHandler.class);
 
     private JDBCClient jdbcClient;
 
-    public static AccountPreferencesHandler create(JDBCClient jc) {
-        AccountPreferencesHandler ach = new AccountPreferencesHandler();
+    public static EverythingIsPossibleHandler create(JDBCClient jc) {
+        EverythingIsPossibleHandler ach = new EverythingIsPossibleHandler();
         ach.jdbcClient = jc;
         return ach;
     }
 
     @Override
     public void handle(RoutingContext context) {
-        
+        HttpServerRequest req = context.request();
+        if (req.method() != HttpMethod.POST) {
+            context.fail(405); // Must be a POST
+        } else {
+            if (!req.isExpectMultipart()) {
+                throw new IllegalStateException("Form body not parsed - do you forget to include a BodyHandler?");
+            }
+            MultiMap params = req.formAttributes();
+            String username = context.user().principal().getString("username");
+
+        }
     }
 
 }

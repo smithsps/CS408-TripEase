@@ -115,9 +115,6 @@ public class TripEaseServer extends AbstractVerticle {
         router.route("/about").handler(routingContext -> {
             routingContext.response().sendFile("webroot/about.html");
         });
-        router.route("/planner").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/planner.html");
-        });
 
 
 
