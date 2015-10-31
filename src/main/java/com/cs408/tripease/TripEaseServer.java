@@ -74,7 +74,7 @@ public class TripEaseServer extends AbstractVerticle {
 
         //The actual login page, from this page the use submits the login information
         router.route("/login").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/login.html");
+            routingContext.response().sendFile("webroot/login.templ");
         });
 
         router.post("/create").handler(AccountCreationHandler.create(jdbcClient));
@@ -84,12 +84,12 @@ public class TripEaseServer extends AbstractVerticle {
 	    //The user details page
 	    router.post("/userdetails").handler(AccountDetailsHandler.create(jdbcClient));
         router.route("/userdetails").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/userdetails.html");
+            routingContext.response().sendFile("webroot/userdetails.templ");
         });
 	    //The usser preferences page
 	    router.post("/userpreferences").handler(AccountPreferencesHandler.create(jdbcClient));
         router.route("/userpreferences").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/preferences.html");
+            routingContext.response().sendFile("webroot/preferences.templ");
         });
 	    //The Trip possibilities page
 	    router.post("/tripPossibilities").handler(AccountCreationHandler.create(jdbcClient));
@@ -99,7 +99,7 @@ public class TripEaseServer extends AbstractVerticle {
 	    // The ratings page
 	    router.post("/userratings").handler(AccountCreationHandler.create(jdbcClient));
         router.route("/userratings").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/ratings.html");
+            routingContext.response().sendFile("webroot/ratings.templ");
         });
 
 
@@ -113,7 +113,7 @@ public class TripEaseServer extends AbstractVerticle {
         //Simple Pages
         router.route("/").handler(FileTemplateHandler.create(tEngine, "webroot/index.templ"));
         router.route("/about").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/about.html");
+            routingContext.response().sendFile("webroot/about.templ");
         });
 
 
