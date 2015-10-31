@@ -84,14 +84,14 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     return;
                 }
 
-                if(username.length > 50 || username.length < 1) {
+                if(username.length() > 50 || username.length() < 1) {
                     log.warn("Username is a invalid length");
                     context.session().put("errorCreateAccount", "Username is too long.");
                     doRedirect(req.response(), "create");
                     return;
                 }
 
-                if(password.length > 256) {
+                if(password.length() > 256) {
                     log.warn("Password is a invalid length");
                     context.session().put("errorCreateAccount", "Password is too long. Please shorten.");
                     doRedirect(req.response(), "create");
