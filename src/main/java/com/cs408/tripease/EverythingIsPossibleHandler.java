@@ -48,13 +48,94 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	String Budget="";
 	String Length="";
 	String[] Hotel = new String[10];
-	int counter = 0;
-	public void test(RoutingContext context){
+	String[] Rest = new String[10];
+	String[] Act = new String[10];
+	int Hotelcounter = 0;
+	int Restcounter = 0;
+	int Actcounter = 0;
+	public void getHotels(RoutingContext context){
 		jdbcClient.getConnection(res -> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
-					System.out.println("Current Location of Location before remove: "+Location);
+					//System.out.println("Current Location of Location before remove: "+Location);
 					Location = Location.replaceAll("[^a-zA-Z]","");
+
+					if(Location.equals("Miami")) {
+						Location = "Miami, FL";
+					}
+					if(Location.equals("Chicago")) {
+						Location = "Chicago, IL";
+					}
+					if(Location.equals("New York")) {
+						Location = "New York City, NY";
+					}
+					connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
+						if(res2.succeeded()) {
+							for (JsonArray line : res2.result().getResults()) {
+							Hotel[Hotelcounter] = line.encode();
+							Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']","");
+							Hotelcounter++;
+							}
+						context.put("hotels", Hotel);
+						getRest(context);
+						//context.next();
+
+						}else{
+							log.error("Could not select from the user table");
+						}
+					});
+				} else {
+					log.error("coould not connect to database below");
+					//context.fail(402);
+				}
+		});
+	}
+	public void getRest(RoutingContext context){
+				jdbcClient.getConnection(res -> {
+				if(res.succeeded()) {
+					SQLConnection connection = res.result();
+					System.out.println("Current Location of Location before removeerer: "+Location);
+					//Location = Location.replaceAll("[^a-zA-Z]","");
+
+					if(Location.equals("Miami")) {
+						Location = "Miami, FL";
+					}
+					if(Location.equals("Chicago")) {
+						Location = "Chicago, IL";
+					}
+					if(Location.equals("New York")) {
+						Location = "New York City, NY";
+					}
+
+					connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res2 -> {
+						if(res2.succeeded()) {
+							for (JsonArray line : res2.result().getResults()) {
+							Rest[Restcounter] = line.encode();
+							Rest[Restcounter] = Rest[Restcounter].replaceAll("[^a-zA-Z' ']","");
+							Restcounter++;
+
+							}
+						context.put("Resturant", Rest);
+						getAct(context);
+						//context.next();
+
+						}else{
+							log.error("Could not select from the user table");
+						}
+					});
+				} else {
+					log.error("coould not connect to database below");
+					//context.fail(402);
+				}
+		});
+
+	}
+	public void getAct(RoutingContext context){
+				jdbcClient.getConnection(res -> {
+				if(res.succeeded()) {
+					SQLConnection connection = res.result();
+					System.out.println("Current Location of Location before remove: "+Location);
+					//Location = Location.replaceAll("[^a-zA-Z]","");
 
 					if(Location.equals("Miami")) {
 						Location = "Miami, FL";
@@ -67,16 +148,16 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 					}
 					System.out.println("CUrrent value of locatoin: "+Location);
 
-					connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
+					connection.query("SELECT name FROM activities WHERE location = '" + Location + "'", res2 -> {
 						if(res2.succeeded()) {
 							for (JsonArray line : res2.result().getResults()) {
-							Hotel[counter] = line.encode();
-							Hotel[counter] = Hotel[counter].replaceAll("[^a-zA-Z]","");
-							counter++;
-							System.out.println("Hotel: "+Hotel[counter-1]);
+							Act[Actcounter] = line.encode();
+							Act[Actcounter] = Act[Actcounter].replaceAll("[^a-zA-Z' ']","");
+							System.out.println("Act: "+Act[Actcounter]);
+							Actcounter++;
 
 							}
-						context.put("hotels", Hotel);
+						context.put("Act", Act);
 						context.next();
 
 						}else{
@@ -88,7 +169,6 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 					//context.fail(402);
 				}
 		});
-
 
 	}
 	@Override
@@ -204,7 +284,9 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 			///////////////////////////////////////////////////////////////
 			//get trip details
 			/////////////////////////////////////////////////////////////
-			test(context);
+			getHotels(context);
+			//getRest(context);
+			//getAct(context);
 			System.out.println("WOW ITS A PRINT STATMENT");
 		}
 		private void doRedirect(HttpServerResponse response, String url) {
