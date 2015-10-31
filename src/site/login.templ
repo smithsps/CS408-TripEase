@@ -70,6 +70,9 @@
                 <button type="submit" class="btn btn-primary">Login</button>
               </div>
             </div>
+            @if{ context.session().get("errorLogin") != null}
+              @{context.session().remove("errorLogin")}
+            @end{}
         </form>
       </div>
 

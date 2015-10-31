@@ -69,13 +69,13 @@ public class TripEaseServer extends AbstractVerticle {
         //Our login form sends the login information via HTTP Post we handle that here
         //Goes to /planner if successful login, 403 if failure.
         router.post("/login").handler(
-            FormLoginHandler.create(authProvider).setDirectLoggedInOKURL("/userdetails")
+            LoginHandler.create(authProvider, "/userdetails")
         );
 
         //The actual login page, from this page the use submits the login information
-        router.route("/login").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/login.templ");
-        });
+        router.route("/login").handler(
+            FileTemplateHandler.create(tEngine, "webroot/login.templ")
+        );
 
         router.post("/create").handler(AccountCreationHandler.create(jdbcClient));
         router.route("/create").handler(
