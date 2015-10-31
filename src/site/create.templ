@@ -87,7 +87,9 @@
                 <button onclick="type=showAlert()" submit" class="btn btn-primary">Create Account</button>
             </div>
         </div>
-        @{ context.session().get("errorCreateAccount")}
+        @if{ context.session().get("errorCreateAccount") != null}
+        @{context.session().get("errorCreateAccount")}
+        @end{}
     </form>
 </div>
 

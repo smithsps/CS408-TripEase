@@ -76,44 +76,66 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                 
                 String salt = getSalt();
                 String hexPassword = JDBCAuthImpl.computeHash(password, salt, "SHA-512");
-    
+
+                if(username.equals("")) {
+                    log.warn("Username is not valid");
+                    context.session().put("errorCreateAccount", "Username is not valid.");
+                    doRedirect(req.response(), "create");
+                    return;
+                }
+
+                if(username.length > 50 || username.length < 1) {
+                    log.warn("Username is a invalid length");
+                    context.session().put("errorCreateAccount", "Username is too long.");
+                    doRedirect(req.response(), "create");
+                    return;
+                }
+
+                if(password.length > 256) {
+                    log.warn("Password is a invalid length");
+                    context.session().put("errorCreateAccount", "Password is too long. Please shorten.");
+                    doRedirect(req.response(), "create");
+                    return;
+                }
 
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
-					log.warn("Password does not match\n\n\n");
+					log.warn("Password does not match");
                     context.session().put("errorCreateAccount", "Passwords does not match.");
                     doRedirect(req.response(), "create");
                     return;
 				}
 				if(!email.equals(emailConfirm)){
 					//emails do not match print error
-					log.warn("Emails do not match\n\n\n");
+					log.warn("Emails do not match");
                     context.session().put("errorCreateAccount", "Emails do not match.");
                     doRedirect(req.response(), "create");
                     return;
                 }
 				Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
 				Matcher m = P.matcher(email);
-				boolean matchFound  = m.matches();
+				boolean matchFound = m.matches();
 
-				if(!matchFound){
-					log.warn("not a vaild email\n\n\n");
+                if (!matchFound) {
+                    log.warn("not a vaild email");
                     context.session().put("errorCreateAccount", "Email is not a valid email.");
                     doRedirect(req.response(), "create");
                     return;
-				}
+                }
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-                        
+
                         connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                                 context.session().remove("errorCreateAccount");
+                                return;
                             } else {
                                 log.error("Could not create the user account in the database.");
-                                context.session().put("errorCreateAccount", "Unknown error. Could not create account.");
+                                context.session().put("errorCreateAccount", "Username is already in use.");
                                 doRedirect(req.response(), "create");
+                                return;
                             }
 
                         });
