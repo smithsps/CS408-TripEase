@@ -95,6 +95,9 @@ TripEase only supports 3 destinations at the moment. Chicago, IL; Miami, FL; and
                 <button type="submit" class="btn btn-primary">Update Preferences</button>
             </div>
         </div>
+        @if{ context.session().get("errorUserPrefs") != null}
+        @{context.session().remove("errorUserPrefs")}
+        @end{}
     </form>
 </div>
 
