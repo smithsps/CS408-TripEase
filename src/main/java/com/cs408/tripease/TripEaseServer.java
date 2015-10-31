@@ -59,6 +59,9 @@ public class TripEaseServer extends AbstractVerticle {
         router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
         router.route().handler(UserSessionHandler.create(authProvider));
 
+        //Favicon Love
+        router.route().handler(FaviconHandler.create("webroot/images/favicon.ico"));
+
 
         MVELTemplateEngine tEngine = MVELTemplateEngine.create();
 
