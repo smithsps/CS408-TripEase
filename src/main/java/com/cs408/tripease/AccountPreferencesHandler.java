@@ -35,9 +35,9 @@ import java.nio.charset.StandardCharsets;
 
 
 
-public class AccountPrefrencesHandler implements Handler<RoutingContext> {
+public class AccountPreferencesHandler implements Handler<RoutingContext> {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountPrefrencesHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(AccountPreferencesHandler.class);
 
 
     private String LocationParam = "Location";
@@ -48,8 +48,8 @@ public class AccountPrefrencesHandler implements Handler<RoutingContext> {
 
     private JDBCClient jdbcClient;
 
-    public static AccountPrefrencesHandler create(JDBCClient jc) {
-        AccountPrefrencesHandler ach = new AccountPrefrencesHandler();
+    public static AccountPreferencesHandler create(JDBCClient jc) {
+        AccountPreferencesHandler ach = new AccountPreferencesHandler();
         ach.jdbcClient = jc;
         return ach;
     }
@@ -75,7 +75,7 @@ public class AccountPrefrencesHandler implements Handler<RoutingContext> {
 
 
             if (Location == null|| FoodType == null || Budget == null || Length == null) {
-                log.warn("Improper parameters inputted in prefrences.");
+                log.warn("Improper parameters inputted in preferences.");
                 context.fail(404);
             } else {
 		    if(Budget.length()>11 || Length.length() >11){

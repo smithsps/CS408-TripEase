@@ -86,15 +86,15 @@ public class TripEaseServer extends AbstractVerticle {
         router.route("/userdetails").handler(routingContext -> {
             routingContext.response().sendFile("webroot/userdetails.html");
         });
-	    //The usser prefrences page
-	    router.post("/userprefrences").handler(AccountPrefrencesHandler.create(jdbcClient));
-        router.route("/userprefrences").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/prefrences.html");
+	    //The usser preferences page
+	    router.post("/userpreferences").handler(AccountPreferencesHandler.create(jdbcClient));
+        router.route("/userpreferences").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/preferences.html");
         });
-	    //The Trip posibilites page
-	    router.post("/tripPosibilites").handler(AccountCreationHandler.create(jdbcClient));
-        router.route("/tripPosibilites").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/posibilites.html");
+	    //The Trip possibilities page
+	    router.post("/tripPossibilities").handler(AccountCreationHandler.create(jdbcClient));
+        router.route("/tripPossibilities").handler(routingContext -> {
+            routingContext.response().sendFile("webroot/possibilities.html");
         });
 	    // The ratings page
 	    router.post("/userratings").handler(AccountCreationHandler.create(jdbcClient));
