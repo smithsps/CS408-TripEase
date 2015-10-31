@@ -27,9 +27,7 @@ a:hover {
 html,
 body {
   height: 100%;
-
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-      url(/images/venice_bg.jpg) no-repeat center center fixed; 
+  
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -40,6 +38,32 @@ body {
   color: #fff;
   text-align: center;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.bg1 {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+  url(/images/venice_bg.jpg) no-repeat center center fixed; 
+}
+
+.bg2 {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+  url(/images/miami.jpg) no-repeat center center fixed; 
+}
+
+.bg3 {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+  url(/images/beach.jpg) no-repeat center center fixed; 
+
+}
+
+.bg4 {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+  url(/images/vacation-house.jpg) no-repeat center center fixed; 
+}
+
+.bg5 {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+  url(/images/time-square.jpg) no-repeat center center fixed; 
 }
 
 /* Extra markup and styles for table-esque vertical and horizontal centering */

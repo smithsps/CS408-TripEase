@@ -20,7 +20,8 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 </head>
-<body>
+<body class="bg1">
+  <div class="bg1,bg2,bg3,bg4,bg5" style="no-repeat -9999px -9999px;"></div>
   <div class="site-wrapper" style="background-color:rgba(0,0,0,0.7)">
     <div class="site-wrapper-inner">
       <div class="cover-container">
@@ -29,16 +30,20 @@
           <div class="inner">
             <h3 class="masthead-brand">TripEase</h3>
             <nav>
-              <ul class="nav masthead-nav">
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                <li class="active"><a href="/login">Login</a></li>
-                <li><a href="/create">Create An Account</a></li>
-		<li><a href="/userdetails">Your Account</a><li>
-		<li><a href="/userpreferences">Your Preferences</a><li>
-		<li><a href="/tripPossibilities">Your Trip Ideas</a><li>
-		<li><a href="/userratings">Ratings</a><li>
-              </ul>
+                <ul class="nav masthead-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                @if{ context.user() == null}
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/create">Create An Account</a></li>
+                @end{}
+                @if{ context.user() != null}
+                    <li><a href="/userdetails">Your Account</a></li>
+                    <li><a href="/userpreferences">Your Preferences</a><li>
+                    <li><a href="/tripPossibilities">Your Trip Ideas</a><li>
+                    <li><a href="/logoff">Log Off </a></li>
+                @end{}
+                </ul>
             </nav>
           </div>
         </div>
@@ -70,6 +75,9 @@
                 <button type="submit" class="btn btn-primary">Login</button>
               </div>
             </div>
+            @if{ context.session().get("errorLogin") != null}
+              @{context.session().remove("errorLogin")}
+            @end{}
         </form>
       </div>
 
@@ -79,5 +87,24 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
-</body>
+    
+    <script>
+    	$(document).ready(function() {
+		    var rand_no = Math.ceil(5 * Math.random());
+			switch(rand_no) {
+				case 0: $("body").addClass("bg1");
+						break;
+				case 1: $("body").addClass("bg2");
+						break;
+				case 2: $("body").addClass("bg3");
+						break;
+				case 3: $("body").addClass("bg4");
+						break;
+				case 4: $("body").addClass("bg5");
+						break;
+				default: $("body").addClass("bg1");
+			}
+    	});
+    </script>
+  </body>
 </html>
