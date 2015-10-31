@@ -34,7 +34,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 
-
 public class AccountPreferencesHandler implements Handler<RoutingContext> {
 
     private static final Logger log = LoggerFactory.getLogger(AccountPreferencesHandler.class);
@@ -45,6 +44,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String BudgetParam = "Budget";
     private String LengthParam = "LengthofStay";
     private String redirectURL = "/tripPossibilities";
+    private String PeopleParam = "NumberofPeople";
 
     private JDBCClient jdbcClient;
 
@@ -70,8 +70,9 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             String FoodType = params.get(FoodTypeParam);
             String Budget = params.get(BudgetParam);
             String Length = params.get(LengthParam);
+			String People = params.get(PeopleParam);
 
-            if (Location == null|| FoodType == null || Budget == null || Length == null) {
+            if (Location == null|| FoodType == null || Budget == null || Length == null || People == null) {
                 log.warn("Improper parameters inputted in preferences.");
                 context.fail(404);
             } else {
@@ -79,13 +80,15 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 		    if(Budget.length()>11 || Length.length() >11){
 			    context.fail(400);
 		    }
-   
+   			if(People.equals("0")||People.contains("-") ){
+			    context.fail(400);
+		    }
                   
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
                         
-                        connection.execute("INSERT INTO preferences VALUES ('" + username + "', '" + FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "')", res2 -> {
+                        connection.execute("INSERT INTO preferences VALUES ('" + username + "', '" + FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "','" + People + "')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                             } else {
