@@ -31,17 +31,21 @@
                 <div class="inner">
                     <h3 class="masthead-brand">TripEase</h3>
                     <nav>
-                        <ul class="nav masthead-nav">
-                        <li><a href="/">Home</a></li>
-                	<li><a href="/about">About</a></li>
-               	 	<li><a href="/login">Login</a></li>
-                	<li><a href="/create">Create An Account</a></li>
-			<li><a href="/userdetails">Your Account</a><li>
-			<li class="active"><a href="/userpreferences">Your Preferences</a><li>
-			<li><a href="/tripPossibilities">Your Trip Ideas</a><li>
-			<li><a href="/userratings">Ratings</a><li>
-                        </ul>
-                    </nav>
+                                    <ul class="nav masthead-nav">
+                                        <li><a href="/">Home</a></li>
+                                        <li><a href="/about">About</a></li>
+                                    @if{ context.user() == null}
+                                        <li><a href="/login">Login</a></li>
+                                        <li><a href="/create">Create An Account</a></li>
+                                    @end{}
+                                    @if{ context.user() != null}
+                                        <li><a href="/userdetails">Your Account</a></li>
+                                        <li><a href="/userpreferences">Your Preferences</a><li>
+                                        <li><a href="/tripPossibilities">Your Trip Ideas</a><li>
+                                        <li><a href="/logoff">Log Off </a></li>
+                                    @end{}
+                                    </ul>
+                                </nav>
                 </div>
             </div>
 
