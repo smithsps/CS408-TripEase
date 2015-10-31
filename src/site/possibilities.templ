@@ -52,10 +52,14 @@
 
           <div class="inner cover">
             <div class="inner cover" style="margin:-5% -10%;">
-                <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Plan Your Trip!/h1>
-                  @if{ context.session().get("errorCreateAccount") != null}
-                  @{context.session().get("errorCreateAccount")}
-                  @end{}
+                <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Plan Your Trip!</h1>
+					<p>
+					@foreach{entry: context.get("hotels")}
+					@if{ entry != null }
+					@{entry}<br>
+					@end{}
+					@end{}
+					</p>
             </div>
           </div>
     </div>
