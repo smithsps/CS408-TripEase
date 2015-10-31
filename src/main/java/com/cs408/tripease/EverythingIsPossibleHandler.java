@@ -47,12 +47,12 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext context) {
         HttpServerRequest req = context.request();
-        if (req.method() != HttpMethod.POST) {
-            context.fail(405); // Must be a POST
-        } else {
-            if (!req.isExpectMultipart()) {
-                throw new IllegalStateException("Form body not parsed - do you forget to include a BodyHandler?");
-            }
+        //if (req.method() != HttpMethod.POST) {
+            //context.fail(405); // Must be a POST
+        //} else {
+            //if (!req.isExpectMultipart()) {
+            //   throw new IllegalStateException("Form body not parsed - do you forget to include a BodyHandler11?");
+            //}
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
 
@@ -107,10 +107,8 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				context.fail(402);
 			}
 		});
+	context.next();
 	}
-    }
-
-
     private void doRedirect(HttpServerResponse response, String url) {
         response.putHeader("location", url).setStatusCode(302).end();
     }
