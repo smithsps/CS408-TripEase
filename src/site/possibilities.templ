@@ -52,15 +52,36 @@
 
           <div class="inner cover">
             <div class="inner cover" style="margin:-5% -10%;">
-                <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Plan Your Trip!</h1>
-					<p>
-					@foreach{entry: context.get("hotels")}
-					@if{ entry != null }
-					@{entry}<br>
-					@end{}
-					@end{}
-					</p>
-            </div>
+                <h1 class="cover-heading" style="text-align:left; margin-bottom:20px;">Possible Trip Choices</h1>
+					<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-4">
+							<h3>Hotels</h3>
+							@foreach{entry: context.get("hotels")}
+								@if{ entry != null }
+								@{entry}<br>
+								@end{}
+							@end{}
+						</div>
+						<div class="col-md-4">
+							<h3>Resturants</h3>
+							@foreach{entry: context.get("resturants")}
+								@if{ entry != null }
+								@{entry}<br>
+								@end{}
+							@end{}
+						</div>
+						<div class="col-md-4">
+							<h3>Activities</h3>
+							@foreach{entry: context.get("activities")}
+								@if{ entry != null }
+								@{entry}<br>
+								@end{}
+							@end{}
+						</div>
+					</div>
+					</div>
+              </div>
           </div>
     </div>
 

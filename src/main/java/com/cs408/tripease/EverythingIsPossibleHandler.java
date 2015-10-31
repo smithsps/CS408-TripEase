@@ -115,7 +115,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 							Restcounter++;
 
 							}
-						context.put("Resturant", Rest);
+						context.put("resturants", Rest);
 						getAct(context);
 						//context.next();
 
@@ -157,7 +157,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 							Actcounter++;
 
 							}
-						context.put("Act", Act);
+						context.put("activities", Act);
 						context.next();
 
 						}else{
