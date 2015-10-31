@@ -56,31 +56,17 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	public void getHotels(RoutingContext context){
 		jdbcClient.getConnection(res -> {
 				if(res.succeeded()) {
+					System.out.println("get hotels");
 					SQLConnection connection = res.result();
-					//System.out.println("Current Location of Location before remove: "+Location);
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
 					connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
 						if(res2.succeeded()) {
 							for (JsonArray line : res2.result().getResults()) {
 							Hotel[Hotelcounter] = line.encode();
 							Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']","");
-							System.out.println("HOTELS FOUND: "+Hotel[Hotelcounter]);
 							Hotelcounter++;
 							}
 						context.put("hotels", Hotel);
 						getPrice(context);
-						//getRest(context);
-						//context.next();
 
 						}else{
 							log.error("Could not select from the user table");
@@ -88,7 +74,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 					});
 				} else {
 					log.error("coould not connect to database below");
-					//context.fail(402);
+					//context.fail(402);u
 				}
 		});
 	}
@@ -98,38 +84,22 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				jdbcClient.getConnection(res -> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
-					//System.out.println("Current Location of Location before remove: "+Location);
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.contains("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.contains("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.contains("New York")) {
-						Location = "New York City, NY";
-					}
 					connection.query("SELECT price FROM hotel WHERE location = '" + Location + "'", res2 -> {
 						if(res2.succeeded()) {
 							for (JsonArray line : res2.result().getResults()) {
 							String temp = Hotel[Hotelcounter];
 							temp = temp.concat(line.encode());
-							temp=temp.replaceAll("[^a-zA-Z' ']","");
+							temp=temp.replaceAll("[^a-zA-Z' '0-9]","");
 							Hotel[Hotelcounter]=temp;
-							System.out.println("prices found: "+temp);
 							Hotelcounter++;
 							}
 						context.put("hotels", Hotel);
-						//getPrice(context);
 						getRest(context);
-						//context.next();
 
 						}else{
 							log.error("Could not select from the user table");
 						}
 					});
-				} else {
 					log.error("coould not connect to database below");
 					//context.fail(402);
 				}
@@ -140,18 +110,6 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
 					System.out.println("get rest: ");
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
-
 					connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res2 -> {
 						if(res2.succeeded()) {
 							for (JsonArray line : res2.result().getResults()) {
@@ -182,19 +140,6 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
 					System.out.println("get activites: "+Location);
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
-					System.out.println("CUrrent value of locatoin: "+Location);
-
 					connection.query("SELECT name FROM activities WHERE location = '" + Location + "'", res2 -> {
 						if(res2.succeeded()) {
 							for (JsonArray line : res2.result().getResults()) {
