@@ -58,7 +58,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
 					//System.out.println("Current Location of Location before remove: "+Location);
-					Location = Location.replaceAll("[^a-zA-Z]","");
+					//Location = Location.replaceAll("[^a-zA-Z]","");
 
 					if(Location.equals("Miami")) {
 						Location = "Miami, FL";
@@ -74,9 +74,54 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 							for (JsonArray line : res2.result().getResults()) {
 							Hotel[Hotelcounter] = line.encode();
 							Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']","");
+							System.out.println("HOTELS FOUND: "+Hotel[Hotelcounter]);
 							Hotelcounter++;
 							}
 						context.put("hotels", Hotel);
+						getPrice(context);
+						//getRest(context);
+						//context.next();
+
+						}else{
+							log.error("Could not select from the user table");
+						}
+					});
+				} else {
+					log.error("coould not connect to database below");
+					//context.fail(402);
+				}
+		});
+	}
+	public void getPrice(RoutingContext context){
+				Hotelcounter=0;
+				System.out.println("get price");
+				jdbcClient.getConnection(res -> {
+				if(res.succeeded()) {
+					SQLConnection connection = res.result();
+					//System.out.println("Current Location of Location before remove: "+Location);
+					//Location = Location.replaceAll("[^a-zA-Z]","");
+
+					if(Location.contains("Miami")) {
+						Location = "Miami, FL";
+					}
+					if(Location.contains("Chicago")) {
+						Location = "Chicago, IL";
+					}
+					if(Location.contains("New York")) {
+						Location = "New York City, NY";
+					}
+					connection.query("SELECT price FROM hotel WHERE location = '" + Location + "'", res2 -> {
+						if(res2.succeeded()) {
+							for (JsonArray line : res2.result().getResults()) {
+							String temp = Hotel[Hotelcounter];
+							temp = temp.concat(line.encode());
+							temp=temp.replaceAll("[^a-zA-Z' ']","");
+							Hotel[Hotelcounter]=temp;
+							System.out.println("prices found: "+temp);
+							Hotelcounter++;
+							}
+						context.put("hotels", Hotel);
+						//getPrice(context);
 						getRest(context);
 						//context.next();
 
@@ -94,7 +139,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				jdbcClient.getConnection(res -> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
-					System.out.println("Current Location of Location before removeerer: "+Location);
+					System.out.println("get rest: ");
 					//Location = Location.replaceAll("[^a-zA-Z]","");
 
 					if(Location.equals("Miami")) {
@@ -112,6 +157,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 							for (JsonArray line : res2.result().getResults()) {
 							Rest[Restcounter] = line.encode();
 							Rest[Restcounter] = Rest[Restcounter].replaceAll("[^a-zA-Z' ']","");
+							System.out.println("resturants: "+Rest[Restcounter]);
 							Restcounter++;
 
 							}
@@ -131,10 +177,11 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 
 	}
 	public void getAct(RoutingContext context){
+		System.out.println("got into the mehtod");
 				jdbcClient.getConnection(res -> {
 				if(res.succeeded()) {
 					SQLConnection connection = res.result();
-					System.out.println("Current Location of Location before remove: "+Location);
+					System.out.println("get activites: "+Location);
 					//Location = Location.replaceAll("[^a-zA-Z]","");
 
 					if(Location.equals("Miami")) {
@@ -194,7 +241,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 						ResultSet resultSet = res2.result();
 						for(JsonArray line : res2.result().getResults()){
 						Location  = line.encode();
-						Location = Location.replaceAll("[^a-zA-Z]","");
+						Location = Location.replaceAll("[^a-zA-Z,' ']","");
 						System.out.println("userLocation:"+Location);
 						}
 
@@ -218,7 +265,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 						ResultSet resultSet = res2.result();
 						for(JsonArray line : res2.result().getResults()){
 						Budget= line.encode();
-						Budget = Budget.replaceAll("[^a-zA-Z]","");
+						Budget = Budget.replaceAll("[^a-zA-Z,' ']","");
 						System.out.println("Budget: "+Budget);
 						}
 
@@ -242,7 +289,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 						ResultSet resultSet = res2.result();
 						for(JsonArray line : res2.result().getResults()){
 						FoodType  = line.encode();
-						FoodType = FoodType.replaceAll("[^a-zA-Z,]","");
+						FoodType = FoodType.replaceAll("[^a-zA-Z,' ']","");
 						System.out.println("Food Type: "+FoodType);
 						}
 
@@ -266,7 +313,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 						ResultSet resultSet = res2.result();
 						for(JsonArray line : res2.result().getResults()){
 						Length= line.encode();
-						Length = Length.replaceAll("[^a-zA-Z]","");
+						Length = Length.replaceAll("[^a-zA-Z,' ']","");
 						System.out.println("Length of stay: "+Length);
 						}
 

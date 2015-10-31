@@ -45,6 +45,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String LengthParam = "LengthofStay";
     private String redirectURL = "/tripPossibilities";
     private String PeopleParam = "NumberofPeople";
+    String Location="";
 
     private JDBCClient jdbcClient;
 
@@ -66,7 +67,17 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
 
-            String Location = params.get(LocationParam);
+            Location = params.get(LocationParam);
+	    Location = Location.toLowerCase();
+	    if(Location.contains("miami")){
+		    Location = "Miami, FL";
+	    }
+	    if(Location.contains("new york")){
+		    Location = "New York City, NY";
+	    }
+	    if(Location.contains("chicago")){
+		    Location = "Chicago, IL";
+	    }
             String FoodType = params.get(FoodTypeParam);
             String Budget = params.get(BudgetParam);
             String Length = params.get(LengthParam);
@@ -80,7 +91,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 		    if(Budget.length()>11 || Length.length() >11){
 			    context.fail(400);
 		    }
-   			if(People.equals("0")||People.contains("-") ){
+   		    if(People.equals("0")||People.contains("-") ){
 			    context.fail(400);
 		    }
                   
@@ -104,7 +115,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
                 });
 
 		/////////////////////////////////////////////////////
-		jdbcClient.getConnection(res -> {
+		/*jdbcClient.getConnection(res -> {
 
 		if(res.succeeded()) {
 			SQLConnection connection = res.result();
@@ -123,7 +134,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 				log.error("coould not connect to database below");
 				context.fail(402);
 			}
-		});
+		});*/
 			
             }
         }
