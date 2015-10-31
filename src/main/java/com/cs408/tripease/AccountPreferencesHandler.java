@@ -44,7 +44,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String FoodTypeParam = "FoodType";
     private String BudgetParam = "Budget";
     private String LengthParam = "LengthofStay";
-    private String redirectURL = "/login";
+    private String redirectURL = "/tripPossibilities";
 
     private JDBCClient jdbcClient;
 
@@ -65,19 +65,17 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             }
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
-	  
-	  
-	    String Location = params.get(LocationParam);
-	    String FoodType = params.get(FoodTypeParam);
-	    String Budget = params.get(BudgetParam);
-	    String Length = params.get(LengthParam);
 
-
+            String Location = params.get(LocationParam);
+            String FoodType = params.get(FoodTypeParam);
+            String Budget = params.get(BudgetParam);
+            String Length = params.get(LengthParam);
 
             if (Location == null|| FoodType == null || Budget == null || Length == null) {
                 log.warn("Improper parameters inputted in preferences.");
                 context.fail(404);
             } else {
+
 		    if(Budget.length()>11 || Length.length() >11){
 			    context.fail(400);
 		    }

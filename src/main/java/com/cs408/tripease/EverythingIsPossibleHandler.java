@@ -60,7 +60,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	    String FoodType ="";
 	    String Budget="";
 	    String Length="";
-	    
+
 	    ///////////////////////////////////////////////////////////
 	    //get user prefrences
 	    /////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 			}
 		});
 
-		
+
 	///////////////////////////////////////////////////////////////
 	//get trip details
 	/////////////////////////////////////////////////////////////
