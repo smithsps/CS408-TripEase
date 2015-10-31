@@ -1,6 +1,4 @@
 package com.cs408.tripease;
-
-
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;

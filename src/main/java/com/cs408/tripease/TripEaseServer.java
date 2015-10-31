@@ -64,17 +64,24 @@ public class TripEaseServer extends AbstractVerticle {
 
 
         //Planner is our application area, so we need them to login before that.
-        router.route("/planner/*").handler(RedirectAuthHandler.create(authProvider, "/login"));
+        router.route("/userdetails*").handler(RedirectAuthHandler.create(authProvider, "/login"));
+        router.route("/userpreferences*").handler(RedirectAuthHandler.create(authProvider, "/login"));
+        router.route("/tripPossibilities*").handler(RedirectAuthHandler.create(authProvider, "/login"));
 
         //Our login form sends the login information via HTTP Post we handle that here
         //Goes to /planner if successful login, 403 if failure.
         router.post("/login").handler(
-            FormLoginHandler.create(authProvider).setDirectLoggedInOKURL("/userdetails")
+            LoginHandler.create(authProvider, "/userdetails")
         );
 
         //The actual login page, from this page the use submits the login information
-        router.route("/login").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/login.templ");
+        router.route("/login").handler(
+            FileTemplateHandler.create(tEngine, "webroot/login.templ")
+        );
+
+        router.route("/logoff").handler(routingContext -> {
+            routingContext.clearUser();
+            routingContext.response().putHeader("location", "/").setStatusCode(302).end();
         });
 
         router.post("/create").handler(AccountCreationHandler.create(jdbcClient));
@@ -83,24 +90,19 @@ public class TripEaseServer extends AbstractVerticle {
         );
 	    //The user details page
 	    router.post("/userdetails").handler(AccountDetailsHandler.create(jdbcClient));
-        router.route("/userdetails").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/userdetails.templ");
-        });
+        router.route("/userdetails").handler(
+                FileTemplateHandler.create(tEngine, "webroot/userdetails.templ")
+        );
 	    //The usser preferences page
 	    router.post("/userpreferences").handler(AccountPreferencesHandler.create(jdbcClient));
-        router.route("/userpreferences").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/preferences.templ");
-        });
+        router.route("/userpreferences").handler(
+                FileTemplateHandler.create(tEngine, "webroot/preferences.templ")
+        );
 	    //The Trip possibilities page
 	    router.post("/tripPossibilities").handler(AccountCreationHandler.create(jdbcClient));
         router.route("/tripPossibilities").handler(
                 FileTemplateHandler.create(tEngine, "webroot/possibilities.templ")
         );
-	    // The ratings page
-	    router.post("/userratings").handler(AccountCreationHandler.create(jdbcClient));
-        router.route("/userratings").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/ratings.templ");
-        });
 
 
 
@@ -112,9 +114,9 @@ public class TripEaseServer extends AbstractVerticle {
 
         //Simple Pages
         router.route("/").handler(FileTemplateHandler.create(tEngine, "webroot/index.templ"));
-        router.route("/about").handler(routingContext -> {
-            routingContext.response().sendFile("webroot/about.templ");
-        });
+        router.route("/about").handler(
+                FileTemplateHandler.create(tEngine, "webroot/about.templ")
+        );
 
 
 
