@@ -7,6 +7,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -39,6 +40,7 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
     private String AgeParam = "Age";
     private String Genderparam = "Gender";
     private String redirectURL = "/userpreferences";
+    boolean there = false;
 
     private JDBCClient jdbcClient;
 
@@ -132,16 +134,34 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-
-                        connection.execute("INSERT INTO userDetails VALUES ('" + username + "', '" + FullName + "', '" + Age + "' , '" + Gender + "')", res2 -> {
-                            if (res2.succeeded()) {
-                                doRedirect(req.response(), redirectURL);
-                            } else {
-				   context.fail(400);
-                                log.error("Could not edit account details in the database.");
-                            }
-
-                        });
+			connection.query("SELECT * FROM userDetails WHERE username = '"+username+"'", res3 -> {
+			if(res3.succeeded()){
+				for(JsonArray line : res3.result().getResults()){
+					there = true; //account already exists need update not insert
+				}
+				if(!there){
+					connection.execute("INSERT INTO userDetails VALUES ('"+username+"','"+FullName+"','"+Age+"','"+Gender+"')", res2 -> {
+						if(res2.succeeded()){
+							doRedirect(req.response(),redirectURL);
+						}else{
+							context.fail(400);
+							log.error("could not insert into the detials table");
+						}
+					});
+				}else{
+					//update
+					String update = "UPDATE userDetails SET fullname = '"+FullName+"', age = '"+Age+"', gender = '"+Gender+"' WHERE username = '"+username+"'";
+					connection.update(update,res4 ->{
+						if(res4.succeeded()){
+							doRedirect(req.response(), redirectURL);
+						}else{
+							log.error("could not update user detials");
+							context.fail(400);
+						}
+					});
+				}
+			}
+			});
                     } else {
                         log.error("Could not connect to database.");
                         context.fail(402);
