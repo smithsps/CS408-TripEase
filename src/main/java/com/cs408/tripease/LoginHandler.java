@@ -20,8 +20,8 @@ public class LoginHandler implements Handler<RoutingContext> {
 
     private AuthProvider authProvider;
 
-    private final String usernameParam = "password";
-    private final String passwordParam = "username";
+    private final String usernameParam = "username";
+    private final String passwordParam = "password";
     private String directLoggedInOKURL = "";
 
     public LoginHandler setDirectLoggedInOKURL(String directLoggedInOKURL) {

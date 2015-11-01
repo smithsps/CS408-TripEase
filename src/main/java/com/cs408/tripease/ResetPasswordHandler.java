@@ -79,7 +79,6 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                 
                 String salt = getSalt();
                 String hexPassword = JDBCAuthImpl.computeHash(password, salt, "SHA-512");
-		System.out.println("pass after: "+password);
 
                 if(username.equals("")) {
                     log.warn("Username is not valid");
@@ -100,11 +99,12 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                     context.session().put("errorCreateAccount", "Password is too long. Please shorten.");
                     doRedirect(req.response(), "create");
                     return;
-                }if(secret.contains("[^a-zA-Z' ']")){
-			log.warn("not a valid entry");
-			context.session().put("errorCreateAccount", "Security question is not valid.");
-			doRedirect(req.response(),"create");
-		}
+                }
+                if(secret.contains("[^a-zA-Z' ']")){
+                    log.warn("not a valid entry");
+                    context.session().put("errorCreateAccount", "Security question is not valid.");
+                    doRedirect(req.response(),"create");
+                }
 
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
@@ -113,9 +113,9 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                     doRedirect(req.response(), "create");
                     return;
 				}
-		Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
-		Matcher m = P.matcher(email);
-		boolean matchFound = m.matches();
+                Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
+                Matcher m = P.matcher(email);
+                boolean matchFound = m.matches();
 
                 if (!matchFound) {
                     log.warn("not a vaild email");
@@ -126,35 +126,36 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-			connection.query("SELECT Answer FROM user WHERE username = '"+username+"'", res3 -> {
-				if(res.succeeded()){
-					for(JsonArray line : res3.result().getResults()){
-						checker = line.encode();
-						checker = checker.replaceAll("[^a-zA-Z]","");
-					}
-					if(checker.equals(secret)){
-						String update = "UPDATE user SET password = '" +hexPassword+"', password_salt = '"+salt+"' WHERE username = '"+username+"'";
-                        			connection.update(update, res2 -> {
-                            				if (res2.succeeded()) {
-                                				doRedirect(req.response(), redirectURL);
-                                				context.session().remove("errorCreateAccount");
-                                				return;
-                            				} else {
-                                				log.error("Could not create the user account in the database.");
-                                				context.session().put("errorCreateAccount", "Username is already in use.");
-                                				doRedirect(req.response(), "create");
-                               	 				return;
-                            				}
 
-                        			});
-					}else{
-						log.error("Incorrect Answer to question check spelling and caps");
-						context.session().put("errorResetPass", "Incorrect Answer to question check spelling");
-						doRedirect(req.response(), "ForgotPassword");
-						return;
-					}
-				}
-			});
+                        connection.query("SELECT Answer FROM user WHERE username = '"+username+"'", res3 -> {
+                        if(res.succeeded()){
+                            for(JsonArray line : res3.result().getResults()){
+                                checker = line.encode();
+                                checker = checker.replaceAll("[^a-zA-Z]","");
+                            }
+                            if(checker.equals(secret)){
+                                String update = "UPDATE user SET password = '" +hexPassword+"', password_salt = '"+salt+"' WHERE username = '"+username+"'";
+                                    connection.update(update, res2 -> {
+                                            if (res2.succeeded()) {
+                                                doRedirect(req.response(), redirectURL);
+                                                context.session().remove("errorCreateAccount");
+                                                return;
+                                            } else {
+                                                log.error("Could not create the user account in the database.");
+                                                context.session().put("errorCreateAccount", "Username is already in use.");
+                                                doRedirect(req.response(), "create");
+                                                return;
+                                            }
+
+                                    });
+                            }else{
+                                log.error("Incorrect Answer to question check spelling and caps");
+                                context.session().put("errorResetPass", "Incorrect Answer to question check spelling");
+                                doRedirect(req.response(), "ForgotPassword");
+                                return;
+                            }
+                        }
+                        });
                     } else {
                         log.error("Could not connect to database.");
                         context.session().put("errorCreateAccount", "Could not connect to the database.");
