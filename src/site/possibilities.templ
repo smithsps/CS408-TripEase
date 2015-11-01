@@ -56,8 +56,8 @@
 					<div class="container-fluid">
 					<div class="row">
 						<div class="col-md-4">
-							<h3>Hotels</h3>
-							@foreach{entry: context.get("hotels")}
+							<h3>Hotels and price per night</h3>
+							@foreach{entry: context.session().get("hotels")}
 								@if{ entry != null }
 								@{entry}<br>
 								@end{}
@@ -65,7 +65,7 @@
 						</div>
 						<div class="col-md-4">
 							<h3>Resturants</h3>
-							@foreach{entry: context.get("resturants")}
+							@foreach{entry: context.session().get("resturants")}
 								@if{ entry != null }
 								@{entry}<br>
 								@end{}
@@ -73,7 +73,7 @@
 						</div>
 						<div class="col-md-4">
 							<h3>Activities</h3>
-							@foreach{entry: context.get("activities")}
+							@foreach{entry: context.session().get("activities")}
 								@if{ entry != null }
 								@{entry}<br>
 								@end{}

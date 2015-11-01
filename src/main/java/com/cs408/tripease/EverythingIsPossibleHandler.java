@@ -14,6 +14,7 @@ import io.vertx.ext.web.Session;
 import io.vertx.ext.web.handler.FormLoginHandler;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
+import io.vertx.core.AsyncResult;
 
 import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
@@ -43,6 +44,8 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 		ach.jdbcClient = jc;
 		return ach;
 	}
+
+
 	String Location="";
 	String FoodType="";
 	String Budget="";
@@ -53,244 +56,143 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	int Hotelcounter = 0;
 	int Restcounter = 0;
 	int Actcounter = 0;
-	public void getHotels(RoutingContext context){
-		jdbcClient.getConnection(res -> {
-				if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					//System.out.println("Current Location of Location before remove: "+Location);
-					Location = Location.replaceAll("[^a-zA-Z]","");
+	String username = "";
 
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
-					connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
-						if(res2.succeeded()) {
-							for (JsonArray line : res2.result().getResults()) {
-							Hotel[Hotelcounter] = line.encode();
-							Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']","");
-							Hotelcounter++;
-							}
-						context.put("hotels", Hotel);
-						getRest(context);
-						//context.next();
 
-						}else{
-							log.error("Could not select from the user table");
-						}
-					});
-				} else {
-					log.error("coould not connect to database below");
-					//context.fail(402);
-				}
-		});
-	}
-	public void getRest(RoutingContext context){
-				jdbcClient.getConnection(res -> {
-				if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					System.out.println("Current Location of Location before removeerer: "+Location);
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
-
-					connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res2 -> {
-						if(res2.succeeded()) {
-							for (JsonArray line : res2.result().getResults()) {
-							Rest[Restcounter] = line.encode();
-							Rest[Restcounter] = Rest[Restcounter].replaceAll("[^a-zA-Z' ']","");
-							Restcounter++;
-
-							}
-						context.put("resturants", Rest);
-						getAct(context);
-						//context.next();
-
-						}else{
-							log.error("Could not select from the user table");
-						}
-					});
-				} else {
-					log.error("coould not connect to database below");
-					//context.fail(402);
-				}
-		});
-
-	}
-	public void getAct(RoutingContext context){
-				jdbcClient.getConnection(res -> {
-				if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					System.out.println("Current Location of Location before remove: "+Location);
-					//Location = Location.replaceAll("[^a-zA-Z]","");
-
-					if(Location.equals("Miami")) {
-						Location = "Miami, FL";
-					}
-					if(Location.equals("Chicago")) {
-						Location = "Chicago, IL";
-					}
-					if(Location.equals("New York")) {
-						Location = "New York City, NY";
-					}
-					System.out.println("CUrrent value of locatoin: "+Location);
-
-					connection.query("SELECT name FROM activities WHERE location = '" + Location + "'", res2 -> {
-						if(res2.succeeded()) {
-							for (JsonArray line : res2.result().getResults()) {
-							Act[Actcounter] = line.encode();
-							Act[Actcounter] = Act[Actcounter].replaceAll("[^a-zA-Z' ']","");
-							System.out.println("Act: "+Act[Actcounter]);
-							Actcounter++;
-
-							}
-						context.put("activities", Act);
-						context.next();
-
-						}else{
-							log.error("Could not select from the user table");
-						}
-					});
-				} else {
-					log.error("coould not connect to database below");
-					//context.fail(402);
-				}
-		});
-
-	}
 	@Override
-		public void handle(RoutingContext context) {
-			HttpServerRequest req = context.request();
-			//if (req.method() != HttpMethod.POST) {
-			//context.fail(405); // Must be a POST
-			//} else {
-			//if (!req.isExpectMultipart()) {
-			//   throw new IllegalStateException("Form body not parsed - do you forget to include a BodyHandler11?");
-			//}
-			MultiMap params = req.formAttributes();
-			String username = context.user().principal().getString("username");
+	public void handle(RoutingContext context) {
 
-			///////////////////////////////////////////////////////////
-			//get user location
-			/////////////////////////////////////////////////////////
-			jdbcClient.getConnection(res -> {
-					if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					connection.query("SELECT Location FROM preferences WHERE username = '"+username+"'", res2 -> {
-						if(res2.succeeded()) {
-						ResultSet resultSet = res2.result();
-						for(JsonArray line : res2.result().getResults()){
-						Location  = line.encode();
-						Location = Location.replaceAll("[^a-zA-Z]","");
-						System.out.println("userLocation:"+Location);
-						}
+		username = context.user().principal().getString("username");
 
-						}else{
-						log.error("Could not select from the user table");
-						}
-						});
-					}else{
-					log.error("coould not connect to database below");
-					context.fail(402);
-					}
-					});
-			//////////////////////////////////////////
-			//get user budget
-			//////////////////////////////////////////
-			jdbcClient.getConnection(res -> {
-					if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					connection.query("SELECT budget FROM preferences WHERE username = '"+username+"'", res2 -> {
-						if(res2.succeeded()) {
-						ResultSet resultSet = res2.result();
-						for(JsonArray line : res2.result().getResults()){
-						Budget= line.encode();
-						Budget = Budget.replaceAll("[^a-zA-Z]","");
-						System.out.println("Budget: "+Budget);
-						}
+		jdbcClient.getConnection(connectionRes -> {
+			if (connectionRes.succeeded()) {
+				System.out.println("Able to get JDBC Connection");
+				queryLocation(context, connectionRes);
 
-						}else{
-						log.error("Could not select budget from pref table table");
-						}
-						});
-					}else{
-					log.error("coould not connect to database below");
-					context.fail(402);
-					}
-					});
-			///////////////////////////////////////////
-			//get user foodType
-			///////////////////////////////////////////
-			jdbcClient.getConnection(res -> {
-					if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					connection.query("SELECT foodtype FROM preferences WHERE username = '"+username+"'", res2 -> {
-						if(res2.succeeded()) {
-						ResultSet resultSet = res2.result();
-						for(JsonArray line : res2.result().getResults()){
-						FoodType  = line.encode();
-						FoodType = FoodType.replaceAll("[^a-zA-Z,]","");
-						System.out.println("Food Type: "+FoodType);
-						}
+			} else {
+				log.error("Could not connect to the database.");
+				context.fail(402);
+			}
+		});
+	}
 
-						}else{
-						log.error("Could not select budget from pref table table");
-						}
-						});
-					}else{
-					log.error("coould not connect to database below");
-					context.fail(402);
-					}
-					});
-			/////////////////////////////////////////////
-			//get length of stay
-			/////////////////////////////////////////////
-			jdbcClient.getConnection(res -> {
-					if(res.succeeded()) {
-					SQLConnection connection = res.result();
-					connection.query("SELECT Length FROM preferences WHERE username = '"+username+"'", res2 -> {
-						if(res2.succeeded()) {
-						ResultSet resultSet = res2.result();
-						for(JsonArray line : res2.result().getResults()){
-						Length= line.encode();
-						Length = Length.replaceAll("[^a-zA-Z]","");
-						System.out.println("Length of stay: "+Length);
-						}
-
-						}else{
-						log.error("Could not select budget from pref table table");
-						}
-						});
-					}else{
-					log.error("coould not connect to database below");
-					context.fail(402);
-					}
-					});
+	private void queryLocation(RoutingContext context, AsyncResult<SQLConnection> connectionRes) {
+		// Get and set locations of user for future queries
+		SQLConnection connection = connectionRes.result();
+		System.out.println("SELECT Location FROM preferences WHERE username = '"+username+"'");
+		connection.query("SELECT Location FROM preferences WHERE username = '"+username+"'", res2 -> {
+			if(res2.succeeded()) {
+				System.out.println("Able to get query location");
+				ResultSet resultSet = res2.result();
+				for(JsonArray line : res2.result().getResults()){
+					Location  = line.encode();
+					Location = Location.replaceAll("[^a-zA-Z,' ']","");
+					System.out.println("userLocation:"+Location);
+				}
+				context.session().put("location", Location);
+				queryBudget(context, connection);
 
 
-			///////////////////////////////////////////////////////////////
-			//get trip details
-			/////////////////////////////////////////////////////////////
-			getHotels(context);
-			//getRest(context);
-			//getAct(context);
-			System.out.println("WOW ITS A PRINT STATMENT");
-		}
-		private void doRedirect(HttpServerResponse response, String url) {
-			response.putHeader("location", url).setStatusCode(302).end();
-		}
+			}else{
+				log.error("Could not select from the user table");
+			}
+		});
+	}
+	private void queryBudget(RoutingContext context, SQLConnection connection) {
+		connection.query("SELECT budget FROM preferences WHERE username = '"+username+"'", res2 -> {
+			if(res2.succeeded()) {
+				System.out.println("Able to get budget query");
+				ResultSet resultSet = res2.result();
+				for(JsonArray line : res2.result().getResults()){
+					Budget= line.encode();
+					Budget = Budget.replaceAll("[^a-zA-Z,' ']","");
+					System.out.println("Budget: "+Budget);
+				}
+				queryHotels(context, connection);
+			}else{
+				log.error("Could not select budget from pref table table");
+			}
+		});
+	}
+	private void queryHotels(RoutingContext context, SQLConnection connection) {
+		// Retrieve Hotels
+		connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
+			if (res2.succeeded()) {
+				System.out.println("Able to get hotel query");
+				for (JsonArray line : res2.result().getResults()) {
+					Hotel[Hotelcounter] = line.encode();
+					Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']", "");
+					Hotelcounter++;
+				}
+				Hotelcounter = 0;
+				queryHotelPricing(context, connection);
+			} else {
+				log.error("Could not select from the user table");
+			}
+		});
+	}
+	private void queryHotelPricing(RoutingContext context, SQLConnection connection) {
+		// Retrieve Hotel Pricing
+		connection.query("SELECT price FROM hotel WHERE location = '" + Location + "'", res3 -> {
+			if (res3.succeeded()) {
+				System.out.println("Able to get hotel pricing");
+				Hotelcounter = 0;
+				for (JsonArray line1 : res3.result().getResults()) {
+					String temp = Hotel[Hotelcounter];
+					temp = temp.concat("   ($" + line1.encode()+")");
+					temp = temp.replaceAll("[^a-zA-Z,' '0-9$()]", "");
+					Hotel[Hotelcounter] = temp;
+					System.out.println("hotel with price: " + Hotel[Hotelcounter]);
+					Hotelcounter++;
+				}
+				context.session().put("hotels", Hotel);
+				queryResturants(context, connection);
+				Hotelcounter = 0;
+			} else {
+				log.error("could not select from user table above");
+			}
+		});
+	}
+	private void queryResturants(final RoutingContext context, final SQLConnection connection) {
+		// Retrieve Resturants
+		connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res4 ->{
+			if(res4.succeeded()){
+				System.out.println("Able to get resturant query");
+				for(JsonArray line2 : res4.result().getResults()){
+					System.out.println("resturant: "+line2.encode());
+					String Resttemp = line2.encode();
+					Resttemp = Resttemp.replaceAll("[^a-zA-Z,' '0-9]", "");
+					Rest[Restcounter] = Resttemp;
+					Restcounter++;
+				}
+				Restcounter=0;
+				context.session().put("resturants", Rest);
 
-		}
+				queryActivites(context, connection);
+			}else{
+				log.error("could not select form resturant table");
+			}
+		});
+	}
+	private void queryActivites(RoutingContext context, SQLConnection connection) {
+		// Retrieve Activies
+		connection.query("SELECT name FROM activities WHERE location ='"+Location+"'", res5 ->{
+			if(res5.succeeded()){
+				System.out.println("Able to get activities query");
+				for(JsonArray line3 : res5.result().getResults()){
+					System.out.println("Activities: "+line3.encode());
+					String ActTemp = line3.encode();
+					ActTemp = ActTemp.replaceAll("[^a-zA-Z,' '0-9]", "");
+					Act[Actcounter]=ActTemp;
+					Actcounter++;
+				}
+				Actcounter=0;
+				context.session().put("activities",Act);
+
+				context.next();
+			}else{
+				log.error("could not select form the activites table");
+			}
+		});
+	}
+}

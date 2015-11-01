@@ -45,6 +45,8 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String LengthParam = "LengthofStay";
     private String redirectURL = "/tripPossibilities";
     private String PeopleParam = "NumberofPeople";
+    String Location="";
+    boolean there = false;
 
     private JDBCClient jdbcClient;
 
@@ -66,7 +68,17 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             MultiMap params = req.formAttributes();
             String username = context.user().principal().getString("username");
 
-            String Location = params.get(LocationParam);
+            Location = params.get(LocationParam);
+	    Location = Location.toLowerCase();
+	    if(Location.contains("miami")){
+		    Location = "Miami, FL";
+	    }
+	    if(Location.contains("new york")){
+		    Location = "New York City, NY";
+	    }
+	    if(Location.contains("chicago")){
+		    Location = "Chicago, IL";
+	    }
             String FoodType = params.get(FoodTypeParam);
             String Budget = params.get(BudgetParam);
             String Length = params.get(LengthParam);
@@ -134,23 +146,51 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 		    if(Budget.length()>11 || Length.length() >11){
 			    context.fail(400);
 		    }
-   			if(People.equals("0")||People.contains("-") ){
+   		    if(People.equals("0")||People.contains("-") ){
 			    context.fail(400);
 		    }
                   
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-                        
-                        connection.execute("INSERT INTO preferences VALUES ('" + username + "', '" + FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "','" + People + "')", res2 -> {
-                            if (res2.succeeded()) {
-                                doRedirect(req.response(), redirectURL);
-                            } else {
+			System.out.println("username: "+username);
+                        connection.query("SELECT * FROM preferences WHERE username = '"+username+"'", res3 ->{
+			if(res3.succeeded()){
+			System.out.println("why the fuck am i in here");
+			ResultSet result = res3.result();
+			for(JsonArray line : res3.result().getResults()){
+				String temp = line.encode();
+				System.out.println("found: "+temp);
+				there=true;
+			}
+			if(!there){
+				connection.execute("INSERT INTO preferences VALUES ('"+username+"','"+FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "','" + People + "')", res2 -> {
+                            	if (res2.succeeded()) {
+                                	doRedirect(req.response(), redirectURL);
+                            	} else {
+				    	context.fail(400);
+                                	log.error("Could not add account prefrencres in the database.");
+                            		}
+                        	});
+			
+			}else{
+				System.out.println("failed query");
+				String update = "UPDATE preferences SET foodtype = '"+FoodType+"',budget = '"+Budget+"',Location = '"+Location+"',Length= '"+Length+"',People = '"+People+"' WHERE username = '"+username+"'";
+				connection.update(update,res4 -> { 
+                            	if (res4.succeeded()) {
+                                	doRedirect(req.response(), redirectURL);
+                            	}else{
 				    context.fail(400);
-                                log.error("Could not edit account prefrencres in the database.");
-                            }
+                                	log.error("Could not edit account prefrencres in the database.");
+                            		}
+                        	});
 
-                        });
+				}
+			}else{
+				//had an error
+			}
+			});
+
                     } else {
                         log.error("Could not connect to database.");
                         context.fail(402);
@@ -158,7 +198,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
                 });
 
 		/////////////////////////////////////////////////////
-		jdbcClient.getConnection(res -> {
+		/*jdbcClient.getConnection(res -> {
 
 		if(res.succeeded()) {
 			SQLConnection connection = res.result();
@@ -177,7 +217,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 				log.error("coould not connect to database below");
 				context.fail(402);
 			}
-		});
+		});*/
 			
             }
         }

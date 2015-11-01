@@ -7,6 +7,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -31,23 +32,23 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import io.vertx.ext.auth.jdbc.impl.JDBCAuthImpl;
 
-public class AccountCreationHandler implements Handler<RoutingContext> {
+public class ResetPasswordHandler implements Handler<RoutingContext> {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountCreationHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ResetPasswordHandler.class);
 
 
     private String usernameParam = "username";
-    private String passwordParam = "password";
-    private String passwordConfirmParam = "passwordConfirm";
+    private String passwordParam = "NewPass";
+    private String passwordConfirmParam = "NewPassConfirm";
     private String emailParam = "email";
-    private String emailConfirmParam = "emailConfirm";
-    private String AnswserParam = "Answer";
+    private String secretAnswerParam = "secretAnswer";
     private String redirectURL = "/login";
+    String checker = "";
 
     private JDBCClient jdbcClient;
 
-    public static AccountCreationHandler create(JDBCClient jc) {
-        AccountCreationHandler ach = new AccountCreationHandler();
+    public static ResetPasswordHandler create(JDBCClient jc) {
+        ResetPasswordHandler ach = new ResetPasswordHandler();
         ach.jdbcClient = jc;
         return ach;
     }
@@ -66,11 +67,11 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
             String password = params.get(passwordParam);
             String passwordConfirm = params.get(passwordConfirmParam);
             String email = params.get(emailParam);
-            String emailConfirm = params.get(emailConfirmParam);
-	    String Answer = params.get(AnswserParam);
+            String secret = params.get(secretAnswerParam);
+
             if (username == null || password == null || passwordConfirm == null ||
-                    email == null || emailConfirm == null || Answer==null) {
-                log.warn("Improper parameters inputted in creation handler.");
+                    email == null || secret==null) {
+                log.warn("Improper parameters inputted in rester handler.");
                 context.fail(400);
             } else {
 
@@ -98,11 +99,12 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     context.session().put("errorCreateAccount", "Password is too long. Please shorten.");
                     doRedirect(req.response(), "create");
                     return;
-                }if(Answer.contains("[^a-zA-Z' ']")){
-			log.warn("not a valid entry");
-			context.session().put("errorCreateAccount", "Security question is not valid.");
-			doRedirect(req.response(),"create");
-		}
+                }
+                if(secret.contains("[^a-zA-Z' ']")){
+                    log.warn("not a valid entry");
+                    context.session().put("errorCreateAccount", "Security question is not valid.");
+                    doRedirect(req.response(),"create");
+                }
 
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
@@ -111,16 +113,9 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     doRedirect(req.response(), "create");
                     return;
 				}
-				if(!email.equals(emailConfirm)){
-					//emails do not match print error
-					log.warn("Emails do not match");
-                    context.session().put("errorCreateAccount", "Emails do not match.");
-                    doRedirect(req.response(), "create");
-                    return;
-                }
-				Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
-				Matcher m = P.matcher(email);
-				boolean matchFound = m.matches();
+                Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
+                Matcher m = P.matcher(email);
+                boolean matchFound = m.matches();
 
                 if (!matchFound) {
                     log.warn("not a vaild email");
@@ -132,18 +127,34 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
 
-                        connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "','"+Answer+"')", res2 -> {
-                            if (res2.succeeded()) {
-                                doRedirect(req.response(), redirectURL);
-                                context.session().remove("errorCreateAccount");
-                                return;
-                            } else {
-                                log.error("Could not create the user account in the database.");
-                                context.session().put("errorCreateAccount", "Username is already in use.");
-                                doRedirect(req.response(), "create");
+                        connection.query("SELECT Answer FROM user WHERE username = '"+username+"'", res3 -> {
+                        if(res.succeeded()){
+                            for(JsonArray line : res3.result().getResults()){
+                                checker = line.encode();
+                                checker = checker.replaceAll("[^a-zA-Z]","");
+                            }
+                            if(checker.equals(secret)){
+                                String update = "UPDATE user SET password = '" +hexPassword+"', password_salt = '"+salt+"' WHERE username = '"+username+"'";
+                                    connection.update(update, res2 -> {
+                                            if (res2.succeeded()) {
+                                                doRedirect(req.response(), redirectURL);
+                                                context.session().remove("errorCreateAccount");
+                                                return;
+                                            } else {
+                                                log.error("Could not create the user account in the database.");
+                                                context.session().put("errorCreateAccount", "Username is already in use.");
+                                                doRedirect(req.response(), "create");
+                                                return;
+                                            }
+
+                                    });
+                            }else{
+                                log.error("Incorrect Answer to question check spelling and caps");
+                                context.session().put("errorResetPass", "Incorrect Answer to question check spelling");
+                                doRedirect(req.response(), "ForgotPassword");
                                 return;
                             }
-
+                        }
                         });
                     } else {
                         log.error("Could not connect to database.");

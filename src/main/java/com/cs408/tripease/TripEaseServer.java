@@ -91,6 +91,11 @@ public class TripEaseServer extends AbstractVerticle {
         router.route("/create").handler(
                 FileTemplateHandler.create(tEngine, "webroot/create.templ")
         );
+
+        router.post("/ForgotPassword").handler(ResetPasswordHandler.create(jdbcClient));
+        router.route("/ForgotPassword").handler(
+                FileTemplateHandler.create(tEngine, "webroot/ForgetPassword.templ")
+        );
 	    //The user details page
 	    router.post("/userdetails").handler(AccountDetailsHandler.create(jdbcClient));
         router.route("/userdetails").handler(
