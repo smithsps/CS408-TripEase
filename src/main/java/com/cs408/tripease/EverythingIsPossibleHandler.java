@@ -166,7 +166,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 			//////////////////////////////////////////
 			//get user budget
 			//////////////////////////////////////////
-			/*jdbcClient.getConnection(res -> {
+			jdbcClient.getConnection(res -> {
 					if(res.succeeded()) {
 					SQLConnection connection = res.result();
 					connection.query("SELECT budget FROM preferences WHERE username = '"+username+"'", res2 -> {
@@ -190,7 +190,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 			///////////////////////////////////////////
 			//get user foodType
 			///////////////////////////////////////////
-			jdbcClient.getConnection(res -> {
+			/*jdbcClient.getConnection(res -> {
 					if(res.succeeded()) {
 					SQLConnection connection = res.result();
 					connection.query("SELECT foodtype FROM preferences WHERE username = '"+username+"'", res2 -> {

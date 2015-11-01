@@ -41,6 +41,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
     private String passwordConfirmParam = "passwordConfirm";
     private String emailParam = "email";
     private String emailConfirmParam = "emailConfirm";
+    private String AnswserParam = "Answer";
     private String redirectURL = "/login";
 
     private JDBCClient jdbcClient;
@@ -66,8 +67,9 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
             String passwordConfirm = params.get(passwordConfirmParam);
             String email = params.get(emailParam);
             String emailConfirm = params.get(emailConfirmParam);
+	    String Answer = params.get(AnswserParam);
             if (username == null || password == null || passwordConfirm == null ||
-                    email == null || emailConfirm == null) {
+                    email == null || emailConfirm == null || Answer==null) {
                 log.warn("Improper parameters inputted in creation handler.");
                 context.fail(400);
             } else {
@@ -96,7 +98,11 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     context.session().put("errorCreateAccount", "Password is too long. Please shorten.");
                     doRedirect(req.response(), "create");
                     return;
-                }
+                }if(Answer.contains("[^a-zA-Z' ']")){
+			log.warn("not a valid entry");
+			context.session().put("errorCreateAccount", "Security question is not valid.");
+			doRedirect(req.response(),"create");
+		}
 
                 if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
@@ -126,7 +132,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
 
-                        connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "')", res2 -> {
+                        connection.execute("INSERT INTO user VALUES ('" + username + "', '" + hexPassword + "', '" + salt + "', '" + email + "','"+Answer+"')", res2 -> {
                             if (res2.succeeded()) {
                                 doRedirect(req.response(), redirectURL);
                                 context.session().remove("errorCreateAccount");
