@@ -66,7 +66,6 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 							Hotelcounter++;
 							}
 							Hotelcounter=0;
-						context.put("hotels", Hotel);
 						}else{
 							log.error("Could not select from the user table");
 						}
@@ -81,26 +80,25 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 								Hotel[Hotelcounter]=temp;
 								System.out.println("hotel with price: " +Hotel[Hotelcounter]);
 								Hotelcounter++;
-								context.put("hotels",Hotel);
-
+								context.session().put("hotels", Hotel);
 							}
 							Hotelcounter=0;
 						}else{
 							log.error("could not select from user table above");
 						}
 					});
-					connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res4 ->{
-						if(res4.succeeded()){
-							for(JsonArray line2 : res4.result().getResults()){
-								System.out.println("resturant: "+line2.encode());
+					connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res4 -> {
+						if (res4.succeeded()) {
+							for (JsonArray line2 : res4.result().getResults()) {
+								System.out.println("resturant: " + line2.encode());
 								String Resttemp = line2.encode();
-								Resttemp = Resttemp.replaceAll("[^a-zA-Z,' '0-9]","");
+								Resttemp = Resttemp.replaceAll("[^a-zA-Z,' '0-9]", "");
 								Rest[Restcounter] = Resttemp;
 								Restcounter++;
-								}
-								Restcounter=0;
-						context.put("resturants",Rest);
-						}else{
+							}
+							Restcounter = 0;
+							context.session().put("resturants", Rest);
+						} else {
 							log.error("could not select form resturant table");
 						}
 					});
@@ -114,7 +112,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 								Actcounter++;
 							}
 							Actcounter=0;
-						context.put("activities",Act);
+						context.session().put("activities",Act);
 						context.next();
 						}else{
 							log.error("could not select form the activites table");
