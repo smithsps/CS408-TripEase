@@ -139,8 +139,8 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 				Hotelcounter = 0;
 				for (JsonArray line1 : res3.result().getResults()) {
 					String temp = Hotel[Hotelcounter];
-					temp = temp.concat("  " + line1.encode());
-					temp = temp.replaceAll("[^a-zA-Z,' '0-9]", "");
+					temp = temp.concat("   ($" + line1.encode()+")");
+					temp = temp.replaceAll("[^a-zA-Z,' '0-9$()]", "");
 					Hotel[Hotelcounter] = temp;
 					System.out.println("hotel with price: " + Hotel[Hotelcounter]);
 					Hotelcounter++;
