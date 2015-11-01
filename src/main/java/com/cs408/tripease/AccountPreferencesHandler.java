@@ -46,6 +46,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String redirectURL = "/tripPossibilities";
     private String PeopleParam = "NumberofPeople";
     String Location="";
+    boolean there = false;
 
     private JDBCClient jdbcClient;
 
@@ -152,16 +153,44 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-                        
-                        connection.execute("INSERT INTO preferences VALUES ('" + username + "', '" + FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "','" + People + "')", res2 -> {
-                            if (res2.succeeded()) {
-                                doRedirect(req.response(), redirectURL);
-                            } else {
+			System.out.println("username: "+username);
+                        connection.query("SELECT * FROM preferences WHERE username = '"+username+"'", res3 ->{
+			if(res3.succeeded()){
+			System.out.println("why the fuck am i in here");
+			ResultSet result = res3.result();
+			for(JsonArray line : res3.result().getResults()){
+				String temp = line.encode();
+				System.out.println("found: "+temp);
+				there=true;
+			}
+			if(!there){
+				connection.execute("INSERT INTO preferences VALUES ('"+username+"','"+FoodType + "', '" + Budget + "' , '" + Location + "','" + Length + "','" + People + "')", res2 -> {
+                            	if (res2.succeeded()) {
+                                	doRedirect(req.response(), redirectURL);
+                            	} else {
+				    	context.fail(400);
+                                	log.error("Could not add account prefrencres in the database.");
+                            		}
+                        	});
+			
+			}else{
+				System.out.println("failed query");
+				String update = "UPDATE preferences SET foodtype = '"+FoodType+"',budget = '"+Budget+"',Location = '"+Location+"',Length= '"+Length+"',People = '"+People+"' WHERE username = '"+username+"'";
+				connection.update(update,res4 -> { 
+                            	if (res4.succeeded()) {
+                                	doRedirect(req.response(), redirectURL);
+                            	}else{
 				    context.fail(400);
-                                log.error("Could not edit account prefrencres in the database.");
-                            }
+                                	log.error("Could not edit account prefrencres in the database.");
+                            		}
+                        	});
 
-                        });
+				}
+			}else{
+				//had an error
+			}
+			});
+
                     } else {
                         log.error("Could not connect to database.");
                         context.fail(402);
