@@ -66,7 +66,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 
 		jdbcClient.getConnection(connectionRes -> {
 			if (connectionRes.succeeded()) {
-				System.out.println("Able to get JDBC Connection");
+				//System.out.println("Able to get JDBC Connection");
 				queryLocation(context, connectionRes);
 
 			} else {
@@ -79,15 +79,15 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	private void queryLocation(RoutingContext context, AsyncResult<SQLConnection> connectionRes) {
 		// Get and set locations of user for future queries
 		SQLConnection connection = connectionRes.result();
-		System.out.println("SELECT Location FROM preferences WHERE username = '"+username+"'");
+		//System.out.println("SELECT Location FROM preferences WHERE username = '"+username+"'");
 		connection.query("SELECT Location FROM preferences WHERE username = '"+username+"'", res2 -> {
 			if(res2.succeeded()) {
-				System.out.println("Able to get query location");
+				//System.out.println("Able to get query location");
 				ResultSet resultSet = res2.result();
 				for(JsonArray line : res2.result().getResults()){
 					Location  = line.encode();
 					Location = Location.replaceAll("[^a-zA-Z,' ']","");
-					System.out.println("userLocation:"+Location);
+					//System.out.println("userLocation:"+Location);
 				}
 				context.session().put("location", Location);
 				queryBudget(context, connection);
@@ -101,12 +101,12 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	private void queryBudget(RoutingContext context, SQLConnection connection) {
 		connection.query("SELECT budget FROM preferences WHERE username = '"+username+"'", res2 -> {
 			if(res2.succeeded()) {
-				System.out.println("Able to get budget query");
+				//System.out.println("Able to get budget query");
 				ResultSet resultSet = res2.result();
 				for(JsonArray line : res2.result().getResults()){
 					Budget= line.encode();
 					Budget = Budget.replaceAll("[^a-zA-Z,' ']","");
-					System.out.println("Budget: "+Budget);
+					//System.out.println("Budget: "+Budget);
 				}
 				queryHotels(context, connection);
 			}else{
@@ -118,7 +118,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 		// Retrieve Hotels
 		connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
 			if (res2.succeeded()) {
-				System.out.println("Able to get hotel query");
+				//System.out.println("Able to get hotel query");
 				for (JsonArray line : res2.result().getResults()) {
 					Hotel[Hotelcounter] = line.encode();
 					Hotel[Hotelcounter] = Hotel[Hotelcounter].replaceAll("[^a-zA-Z' ']", "");
@@ -135,14 +135,14 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 		// Retrieve Hotel Pricing
 		connection.query("SELECT price FROM hotel WHERE location = '" + Location + "'", res3 -> {
 			if (res3.succeeded()) {
-				System.out.println("Able to get hotel pricing");
+				//System.out.println("Able to get hotel pricing");
 				Hotelcounter = 0;
 				for (JsonArray line1 : res3.result().getResults()) {
 					String temp = Hotel[Hotelcounter];
 					temp = temp.concat("   ($" + line1.encode()+")");
 					temp = temp.replaceAll("[^a-zA-Z,' '0-9$()]", "");
 					Hotel[Hotelcounter] = temp;
-					System.out.println("hotel with price: " + Hotel[Hotelcounter]);
+					//System.out.println("hotel with price: " + Hotel[Hotelcounter]);
 					Hotelcounter++;
 				}
 				context.session().put("hotels", Hotel);
@@ -157,9 +157,9 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 		// Retrieve Resturants
 		connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res4 ->{
 			if(res4.succeeded()){
-				System.out.println("Able to get resturant query");
+				//System.out.println("Able to get resturant query");
 				for(JsonArray line2 : res4.result().getResults()){
-					System.out.println("resturant: "+line2.encode());
+					//System.out.println("resturant: "+line2.encode());
 					String Resttemp = line2.encode();
 					Resttemp = Resttemp.replaceAll("[^a-zA-Z,' '0-9]", "");
 					Rest[Restcounter] = Resttemp;
@@ -178,9 +178,9 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 		// Retrieve Activies
 		connection.query("SELECT name FROM activities WHERE location ='"+Location+"'", res5 ->{
 			if(res5.succeeded()){
-				System.out.println("Able to get activities query");
+				//System.out.println("Able to get activities query");
 				for(JsonArray line3 : res5.result().getResults()){
-					System.out.println("Activities: "+line3.encode());
+					//System.out.println("Activities: "+line3.encode());
 					String ActTemp = line3.encode();
 					ActTemp = ActTemp.replaceAll("[^a-zA-Z,' '0-9]", "");
 					Act[Actcounter]=ActTemp;

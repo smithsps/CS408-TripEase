@@ -153,14 +153,14 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
-			System.out.println("username: "+username);
+			//System.out.println("username: "+username);
                         connection.query("SELECT * FROM preferences WHERE username = '"+username+"'", res3 ->{
 			if(res3.succeeded()){
-			System.out.println("why the fuck am i in here");
+			//System.out.println("why the fuck am i in here");
 			ResultSet result = res3.result();
 			for(JsonArray line : res3.result().getResults()){
 				String temp = line.encode();
-				System.out.println("found: "+temp);
+				//System.out.println("found: "+temp);
 				there=true;
 			}
 			if(!there){
@@ -174,7 +174,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
                         	});
 			
 			}else{
-				System.out.println("failed query");
+				//System.out.println("failed query");
 				String update = "UPDATE preferences SET foodtype = '"+FoodType+"',budget = '"+Budget+"',Location = '"+Location+"',Length= '"+Length+"',People = '"+People+"' WHERE username = '"+username+"'";
 				connection.update(update,res4 -> { 
                             	if (res4.succeeded()) {
