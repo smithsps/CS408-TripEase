@@ -84,7 +84,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
             String Length = params.get(LengthParam);
 			String People = params.get(PeopleParam);
 
-            if(Location.equals("") || FoodType.equals("") || Budget.equals("") || Length.equals("") || People.equals("")) {
+            if(Location.equals("") || Budget.equals("") || Length.equals("") || People.equals("")) {
                 log.warn("One or more preferences left blank.");
                 context.session().put("errorUserPrefs", "One or more preferences left blank.");
                 doRedirect(req.response(), "userpreferences");

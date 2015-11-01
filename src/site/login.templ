@@ -76,11 +76,6 @@
                 <button type="submit" class="btn btn-primary">Login</button>
               </div>
             </div>
-	    <div class="form-grup">
-	       <div class="col-xs-offset-2 col-xs-10">
-	         <button class ="btn btn-primary">Forgot Password</button>
-	       </div>
-	    </div>
             @if{ context.session().get("errorLogin") != null}
               @{context.session().remove("errorLogin")}
             @end{}
