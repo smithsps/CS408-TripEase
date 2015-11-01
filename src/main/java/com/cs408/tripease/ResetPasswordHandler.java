@@ -134,7 +134,7 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                                 checker = checker.replaceAll("[^a-zA-Z]","");
                             }
                             if(checker.equals(secret)){
-                                String update = "UPDATE user SET password = '" +hexPassword+"', password_salt = '"+salt+"' WHERE username = '"+username+"'";
+                                String update = "UPDATE user SET password = '" +hexPassword+"', password_salt = '"+salt+"'";
                                     connection.update(update, res2 -> {
                                             if (res2.succeeded()) {
                                                 doRedirect(req.response(), redirectURL);

@@ -47,6 +47,7 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
     private String PeopleParam = "NumberofPeople";
     String Location="";
     boolean there = false;
+    String Budget="";
 
     private JDBCClient jdbcClient;
 
@@ -70,17 +71,18 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 
             Location = params.get(LocationParam);
 	    Location = Location.toLowerCase();
-	    if(Location.contains("miami")){
+	    if(Location.equals("Miami, FL")){
 		    Location = "Miami, FL";
 	    }
-	    if(Location.contains("new york")){
+	    if(Location.equals("New York City, NY")){
 		    Location = "New York City, NY";
 	    }
-	    if(Location.contains("chicago")){
+	    if(Location.equals("Chicago, IL")){
 		    Location = "Chicago, IL";
 	    }
             String FoodType = params.get(FoodTypeParam);
-            String Budget = params.get(BudgetParam);
+            Budget = params.get(BudgetParam);
+	    Budget = Budget.replaceAll("[^0-9]","");
             String Length = params.get(LengthParam);
 			String People = params.get(PeopleParam);
 
@@ -176,14 +178,14 @@ public class AccountPreferencesHandler implements Handler<RoutingContext> {
 			}else{
 				//System.out.println("failed query");
 				String update = "UPDATE preferences SET foodtype = '"+FoodType+"',budget = '"+Budget+"',Location = '"+Location+"',Length= '"+Length+"',People = '"+People+"' WHERE username = '"+username+"'";
-				connection.update(update,res4 -> { 
+				/*connection.update(update,res4 -> { 
                             	if (res4.succeeded()) {
                                 	doRedirect(req.response(), redirectURL);
                             	}else{
 				    context.fail(400);
                                 	log.error("Could not edit account prefrencres in the database.");
                             		}
-                        	});
+                        	});*/
 
 				}
 			}else{

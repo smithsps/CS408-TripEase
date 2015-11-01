@@ -74,8 +74,9 @@ public class LoginHandler implements Handler<RoutingContext> {
                         // Either no session or no return url
                         doRedirect(req.response(), directLoggedInOKURL);
                     } else {
-                        context.session().put("errorLogin", "Invalid Username or Password.");
-                        doRedirect(req.response(), "login");
+                        //context.session().put("errorLogin", "Invalid Username or Password.");
+                        //doRedirect(req.response(), "login");
+			context.fail(400);
                     }
                 });
             }

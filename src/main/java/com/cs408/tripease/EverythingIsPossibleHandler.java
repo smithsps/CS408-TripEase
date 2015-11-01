@@ -50,9 +50,9 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	String FoodType="";
 	String Budget="";
 	String Length="";
-	String[] Hotel = new String[10];
-	String[] Rest = new String[10];
-	String[] Act = new String[10];
+	String[] Hotel = new String[15];
+	String[] Rest = new String[15];
+	String[] Act = new String[15];
 	int Hotelcounter = 0;
 	int Restcounter = 0;
 	int Actcounter = 0;
@@ -116,7 +116,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	}
 	private void queryHotels(RoutingContext context, SQLConnection connection) {
 		// Retrieve Hotels
-		connection.query("SELECT name FROM hotel WHERE location = '" + Location + "'", res2 -> {
+		connection.query("SELECT name FROM hotel ", res2 -> {
 			if (res2.succeeded()) {
 				//System.out.println("Able to get hotel query");
 				for (JsonArray line : res2.result().getResults()) {
@@ -133,7 +133,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	}
 	private void queryHotelPricing(RoutingContext context, SQLConnection connection) {
 		// Retrieve Hotel Pricing
-		connection.query("SELECT price FROM hotel WHERE location = '" + Location + "'", res3 -> {
+		connection.query("SELECT price FROM hotel", res3 -> {
 			if (res3.succeeded()) {
 				//System.out.println("Able to get hotel pricing");
 				Hotelcounter = 0;
@@ -155,7 +155,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	}
 	private void queryResturants(final RoutingContext context, final SQLConnection connection) {
 		// Retrieve Resturants
-		connection.query("SELECT name FROM resturant WHERE location = '" + Location + "'", res4 ->{
+		connection.query("SELECT name FROM resturant", res4 ->{
 			if(res4.succeeded()){
 				//System.out.println("Able to get resturant query");
 				for(JsonArray line2 : res4.result().getResults()){
@@ -176,7 +176,7 @@ public class EverythingIsPossibleHandler implements Handler<RoutingContext> {
 	}
 	private void queryActivites(RoutingContext context, SQLConnection connection) {
 		// Retrieve Activies
-		connection.query("SELECT name FROM activities WHERE location ='"+Location+"'", res5 ->{
+		connection.query("SELECT name FROM activities", res5 ->{
 			if(res5.succeeded()){
 				//System.out.println("Able to get activities query");
 				for(JsonArray line3 : res5.result().getResults()){

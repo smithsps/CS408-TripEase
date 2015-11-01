@@ -104,30 +104,30 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
 			doRedirect(req.response(),"create");
 		}
 
-                if(!password.equals(passwordConfirm)){
+                /*if(!password.equals(passwordConfirm)){
 					//passwords do not match print errror
 					log.warn("Password does not match");
                     context.session().put("errorCreateAccount", "Passwords does not match.");
                     doRedirect(req.response(), "create");
                     return;
-				}
-				if(!email.equals(emailConfirm)){
+				}*/
+		/*if(!email.equals(emailConfirm)){
 					//emails do not match print error
 					log.warn("Emails do not match");
                     context.session().put("errorCreateAccount", "Emails do not match.");
                     doRedirect(req.response(), "create");
                     return;
-                }
-				Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
-				Matcher m = P.matcher(email);
-				boolean matchFound = m.matches();
+                }*/
+		Pattern P = Pattern.compile("[a-z0-9].+@.+\\.[a-z]+");
+		Matcher m = P.matcher(email);
+		boolean matchFound = m.matches();
 
-                if (!matchFound) {
+                /*if (!matchFound) {
                     log.warn("not a vaild email");
                     context.session().put("errorCreateAccount", "Email is not a valid email.");
                     doRedirect(req.response(), "create");
                     return;
-                }
+                }*/
                 jdbcClient.getConnection(res -> {
                     if (res.succeeded()) {
                         SQLConnection connection = res.result();
@@ -139,7 +139,7 @@ public class AccountCreationHandler implements Handler<RoutingContext> {
                                 return;
                             } else {
                                 log.error("Could not create the user account in the database.");
-                                context.session().put("errorCreateAccount", "Username is already in use.");
+                                //context.session().put("errorCreateAccount", "Username is already in use.");
                                 doRedirect(req.response(), "create");
                                 return;
                             }

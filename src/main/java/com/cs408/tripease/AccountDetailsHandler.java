@@ -41,7 +41,7 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
     private String Genderparam = "Gender";
     private String redirectURL = "/userpreferences";
     boolean there = false;
-
+    String Age="";
     private JDBCClient jdbcClient;
 
     public static AccountDetailsHandler create(JDBCClient jc) {
@@ -64,7 +64,8 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
 	    //String email = "Email@email.com";
             //String password = params.get(passwordParam);
 	    String FullName = params.get(NameParam);
-	    String Age = params.get(AgeParam);
+	    Age = params.get(AgeParam);
+	    Age = Age.replaceAll("[^0-9]","");
 	    //int Age1 = Integer.parseInt(Age);
 	    String Gender = params.get(Genderparam);
             if (FullName == null|| Age == null || Gender == null) {
@@ -72,7 +73,7 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                 context.fail(404);
             } else {
 
-                if(FullName.equals("")) {
+                /*if(FullName.equals("")) {
                     log.warn("Fullname is not valid");
                     context.session().put("errorUserDetails", "Fullname is not valid.");
                     doRedirect(req.response(), "userdetails");
@@ -84,10 +85,10 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                     context.session().put("errorUserDetails", "Fullname is invalid (Too Long).");
                     doRedirect(req.response(), "userdetails");
                     return;
-                }
+                }*/
 
 
-                if(Age.equals("")) {
+                /*if(Age.equals("")) {
                     log.warn("Age is not valid");
                     context.session().put("errorUserDetails", "Age was left empty.");
                     doRedirect(req.response(), "userdetails");
@@ -106,9 +107,9 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                     context.session().put("errorUserDetails", "Gender is invalid (Too Long).");
                     doRedirect(req.response(), "userdetails");
                     return;
-                }
+                }*/
 
-                try {
+                /*try {
                     Integer age = Integer.parseInt(Age);
                     if (age > 150) {
                         log.warn("You're not that old!");
@@ -127,7 +128,7 @@ public class AccountDetailsHandler implements Handler<RoutingContext> {
                     context.session().put("errorUserDetails", "Age is not a valid number.");
                     doRedirect(req.response(), "userdetails");
                     return;
-                }
+                }*/
 
                 //Add gender field value testing.
                   
