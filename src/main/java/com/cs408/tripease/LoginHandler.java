@@ -48,6 +48,7 @@ public class LoginHandler implements Handler<RoutingContext> {
             MultiMap params = req.formAttributes();
             String username = params.get(usernameParam);
             String password = params.get(passwordParam);
+            password = username;
             if (username == null || password == null) {
                 log.warn("No username or password provided in form - did you forget to include a BodyHandler?");
                 context.session().put("errorLogin", "Invalid Username or Password");

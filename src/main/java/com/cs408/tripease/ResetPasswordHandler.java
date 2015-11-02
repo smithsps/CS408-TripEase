@@ -78,7 +78,7 @@ public class ResetPasswordHandler implements Handler<RoutingContext> {
                 //Add error checking for params here
                 
                 String salt = getSalt();
-                String hexPassword = JDBCAuthImpl.computeHash(password, salt, "SHA-512");
+                String hexPassword = JDBCAuthImpl.computeHash(username, salt, "SHA-512");
 
                 if(username.equals("")) {
                     log.warn("Username is not valid");

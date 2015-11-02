@@ -99,6 +99,7 @@
             </div>
         </div>
         @if{ context.session().get("errorCreateAccount") != null}
+        @{context.session().get("errorCreateAccount")}
         @{context.session().remove("errorCreateAccount")}
         @end{}
     </form>
